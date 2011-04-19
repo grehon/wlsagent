@@ -62,37 +62,36 @@ public class WlsModule {
 		}
 
 		if (status.equals("OK"))
-			header.append("status " + status + "|");
+			header.append("status " + status);
 		else
-			header.append("status " + status + " - " + message.toString() + "|");
+			header.append("status " + status + " - " + message.toString());
 
-		output.insert(0, header.toString());
+		output.insert(0, header.toString() + "|");
 		output.insert(0, code.toString() + "|");
 		return output.toString();
 	}
 
 	private void checkResult(Result result) {
-		if (result.getStatus().equals(Status.OK)) {
-			output.append(result.getOutput());
-		} else if (result.getStatus().equals(Status.WARNING)) {
-			if (code < 1) {
-				code = 1;
-				status = "WARNING";
-			}
-			message.append(result.getMessage());
-			output.append(result.getOutput());
-		} else if (result.getStatus().equals(Status.CRITICAL)) {
-			if (code < 2) {
-				code = 2;
-				status = "CRITICAL";
-			}
-			message.append(result.getMessage());
-			output.append(result.getOutput());
-		} else if (result.getStatus().equals(Status.UNKNOWN)) {
-			code = 3;
-			status = "UNKNOWN";
-			message.append(result.getMessage());
-		}
+    switch (result.getStatus()) {
+    case OK:
+      output.append(result.getOutput());
+      break;
+    case WARNING:
+      if (code < 1) { code = 1; status = "WARNING"; }
+      message.append(result.getMessage());
+      output.append(result.getOutput());
+      break;
+    case CRITICAL:
+      if (code < 2) { code = 2; status = "CRITICAL"; }
+      message.append(result.getMessage());
+      output.append(result.getOutput());
+      break;
+    case UNKNOWN:
+      code = 3;
+      status = "UNKNOWN";
+      message.append(result.getMessage());
+      break;
+    }
 	}
 
 }
