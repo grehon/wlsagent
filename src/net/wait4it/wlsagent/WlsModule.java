@@ -72,26 +72,26 @@ public class WlsModule {
 	}
 
 	private void checkResult(Result result) {
-    switch (result.getStatus()) {
-    case OK:
-      output.append(result.getOutput());
-      break;
-    case WARNING:
-      if (code < 1) { code = 1; status = "WARNING"; }
-      message.append(result.getMessage());
-      output.append(result.getOutput());
-      break;
-    case CRITICAL:
-      if (code < 2) { code = 2; status = "CRITICAL"; }
-      message.append(result.getMessage());
-      output.append(result.getOutput());
-      break;
-    case UNKNOWN:
-      code = 3;
-      status = "UNKNOWN";
-      message.append(result.getMessage());
-      break;
-    }
+		switch (result.getStatus()) {
+		case OK:
+			output.append(result.getOutput());
+			break;
+		case WARNING:
+			if (code < 1) { code = 1; status = "WARNING"; }
+			message.append(result.getMessage());
+			output.append(result.getOutput());
+			break;
+		case CRITICAL:
+			if (code < 2) { code = 2; status = "CRITICAL"; }
+			message.append(result.getMessage());
+			output.append(result.getOutput());
+			break;
+		case UNKNOWN:
+			code = 3;
+			status = "UNKNOWN";
+			message.append(result.getMessage());
+			break;
+		}
 	}
 
 }
