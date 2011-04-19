@@ -32,9 +32,7 @@ import javax.naming.Context;
  *
  */
 public class JmxConnectionFactory {
-	private static final String PROTOCOL = "t3";
-	private static final String JNDI_ROOT = "/jndi/";
-	private static final String JNDI_NAME = "weblogic.management.mbeanservers.runtime";
+	private static final String JNDI_NAME = "/jndi/weblogic.management.mbeanservers.runtime";
 
 	public static MBeanServerConnection getInstance(Map<String,String> params) {
 		HashMap<String,String> map = new HashMap<String,String>();
@@ -46,7 +44,7 @@ public class JmxConnectionFactory {
 		map.put(JMXConnectorFactory.PROTOCOL_PROVIDER_PACKAGES, "weblogic.management.remote");
 		map.put("jmx.remote.x.request.waiting.timeout", "5000");
 		try {
-			url = new JMXServiceURL("service:jmx:" + PROTOCOL + "://" + params.get("hostname") + ":" + params.get("port") + JNDI_ROOT + JNDI_NAME);
+			url = new JMXServiceURL("service:jmx:t3://" + params.get("hostname") + ":" + params.get("port") + JNDI_NAME);
 			connector = JMXConnectorFactory.connect(url, map);
 			connection = connector.getMBeanServerConnection();
 		} catch (Exception e) {
