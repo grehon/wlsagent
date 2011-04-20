@@ -6,7 +6,7 @@ Wlsagent is a small JMX client, which exposes some performance metrics for WebLo
 
 You can get the performance data by submitting simple HTTP requests to the plugin. Below is an example of unix CLI invocation with wget :
 
-wget -q -O - http://localhost:8080/wlsagent//WlsAgent?hostname=localhost&port=7001&username=nagios&password=nagios&jvm=UsedMemory;80;90&thread-pool=ThreadActiveCount;90;95&jta=ActiveTransactions;100;120&component=testservlet;100;150|dashboard;100;150&jdbc=ds1;2;4'
+wget -q -O - http://localhost:8080/wlsagent/WlsAgent?hostname=localhost&port=7001&username=nagios&password=nagios&jvm=UsedMemory;80;90&thread-pool=ThreadActiveCount;90;95&jta=ActiveTransactions;100;120&component=testservlet;100;150|dashboard;100;150&jdbc=ds1;2;4'
 
 The plugin is listening on port 8080, and the WebLogic server we want to monitor is listening on the port 7001 of the same machine ('hostname' and 'port' parameters). The parameters 'username' and 'password' are used to authenticate, notice the WebLogic user specified only have to belong to the monitor group.
 
