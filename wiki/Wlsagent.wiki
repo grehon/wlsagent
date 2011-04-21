@@ -29,7 +29,7 @@ The content of the working directory should look like this :
   * the wlsagent.jar file
   * the previous shell script
 
-The lib directory contains the jar dependencies for Jetty and the WebLogic implementation of the 't3' protocol :
+The lib directory contains the jar dependencies for Jetty and the !WebLogic implementation of the 't3' protocol :
 
 {{{
 jetty-continuation-7.3.0.v20110203.jar
@@ -48,7 +48,7 @@ You can get the last Jetty distribution from the Eclipse site :
 
 http://www.eclipse.org/jetty/downloads.php
 
-The WebLogic jars are available in the ${WL_HOME}/server/lib directory of the WebLogic server distribution.
+The !WebLogic jars are available in the ${WL_HOME}/server/lib directory of the !WebLogic server distribution.
 
 Below is a Unix CLI invocation example of the previous script:
 
@@ -66,9 +66,9 @@ The above command produces the following output:
 
 3|Unable to get MBeanServerConnection for JMXServiceURL service:jmx:t3://localhost:7001/jndi/weblogic.management.mbeanservers.runtime
 
-That's fair enough, as we have to provide credentials to access to our WebLogic MBeanServer. Notice the first character of the command output string is the regular Nagios exit code (UNKNOWN in this case).
+That's fair enough, as we have to provide credentials to access to our !WebLogic MBeanServer. Notice the first character of the command output string is the regular Nagios exit code (UNKNOWN in this case).
 
-In order to monitor your application servers, you can create a specific user on the WebLogic side, and make sure it belongs to the monitor group.
+In order to monitor your application servers, you can create a specific user on the !WebLogic side, and make sure it belongs to the monitor group.
 
 Let's retry by adding the credentials :
 
@@ -78,7 +78,7 @@ This time, we get this output:
 
 0|server1: status OK|
 
-The Nagios exit code is 0 (OK), as we didn't perform any test. 'server1' is the name of our WebLogic instance.
+The Nagios exit code is 0 (OK), as we didn't perform any test. 'server1' is the name of our !WebLogic instance.
 
 Next we're going to get information about the JVM heap usage by adding jvm=UsedMemory;80;90 to the request parameters :
 
