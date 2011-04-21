@@ -2,7 +2,7 @@
 
 === Introduction ===
 
-Wlsagent is a small JMX client, which exposes performance metrics for WebLogic servers 9.x and 10.x.
+Wlsagent is a small JMX client, which exposes performance metrics for !WebLogic servers 9.x and 10.x.
 
 You can get the performance data by submitting simple HTTP requests to the plugin, as it embeds a Jetty container. The plugin runs in the background and handles every monitoring request, which allows a small memory footprint (a 32MB JVM heap is sufficient), no CPU overhead and short response time.
 
