@@ -64,7 +64,7 @@ The above command produces the following output:
 
 3|Unable to get MBeanServerConnection for JMXServiceURL service:jmx:t3://localhost:7001/jndi/weblogic.management.mbeanservers.runtime
 
-That's fair enough, as we have to provide credentials to access to our !WebLogic MBeanServer. Notice the first character of the command output string is the regular Nagios exit code (UNKNOWN in this case).
+That's fair enough, as we have to provide credentials to access our !WebLogic MBeanServer. Notice the first character of the command output string is the regular Nagios exit code (UNKNOWN in this case).
 
 In order to monitor your application servers, you can create a specific user on the !WebLogic side, and make sure it belongs to the monitor group.
 
