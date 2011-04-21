@@ -1,22 +1,103 @@
 #summary This page describe the wlsagent Nagios plugin.
 
-= Introduction =
+=== Introduction ===
 
-Wlsagent is a small JMX client, which exposes some performance metrics for WebLogic servers 9.x and 10.x.
+Wlsagent is a small JMX client, which exposes performance metrics for WebLogic servers 9.x and 10.x.
 
-You can get the performance data by submitting simple HTTP requests to the plugin. Below is an example of unix CLI invocation with wget :
+You can get the performance data by submitting simple HTTP requests to the plugin, as it embeds a Jetty container. The plugin runs in the background and handles every monitoring request, which allows a small memory footprint (a 32MB JVM heap is sufficient), no CPU overhead and short response time.
 
-wget -q -O - http://localhost:8080/wlsagent/WlsAgent?hostname=localhost&port=7001&username=nagios&password=nagios&jvm=UsedMemory;80;90&thread-pool=ThreadActiveCount;90;95&jta=ActiveTransactions;100;120&component=testservlet;100;150|dashboard;100;150&jdbc=ds1;2;4'
+=== Running the plugin ===
 
-The plugin is listening on port 8080, and the WebLogic server we want to monitor is listening on the port 7001 of the same machine ('hostname' and 'port' parameters). The parameters 'username' and 'password' are used to authenticate, notice the WebLogic user specified only have to belong to the monitor group.
+First of all, you have to run the plugin. This script will do the job (make sure JAVA_HOME variable is defined):
 
+{{{
+#!/bin/bash
 
+CURRENT_PATH=$(dirname "$0")
+LIB_PATH=${CURRENT_PATH}/lib
+CLASSPATH=${CURRENT_PATH}/wlsagent.jar
 
+for jar in $(find ${LIB_PATH} -name '*.jar'); do
+  CLASSPATH=${CLASSPATH}:${jar};
+done
 
+${JAVA_HOME}/bin/java ${JAVA_OPTS} -Xmx32m -cp ${CLASSPATH} net.wait4it.wlsagent.WlsAgent "$@" > /dev/null 2>&1 &
+}}}
 
-= Details =
+The content of the working directory should look like this :
+  * the lib directory
+  * the wlsagent.jar file
+  * the previous shell script
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+The lib directory contains the jar dependencies for Jetty and the WebLogic implementation of the 't3' protocol :
+
+{{{
+jetty-continuation-7.3.0.v20110203.jar
+jetty-http-7.3.0.v20110203.jar
+jetty-io-7.3.0.v20110203.jar
+jetty-security-7.3.0.v20110203.jar
+jetty-server-7.3.0.v20110203.jar
+jetty-servlet-7.3.0.v20110203.jar
+jetty-util-7.3.0.v20110203.jar
+servlet-api-2.5.jar
+wlclient.jar
+wljmxclient.jar
+}}}
+
+You can get the last Jetty distribution from the Eclipse site :
+
+http://www.eclipse.org/jetty/downloads.php
+
+The WebLogic jars are available in the ${WL_HOME}/server/lib directory of the WebLogic server distribution.
+
+Below is a Unix CLI invocation example of the previous script:
+
+./wlsagent.sh 8080
+
+=== Using it ===
+  
+Once the plugin is running, you can invoke it for instance with wget :
+
+wget -q -O - http://localhost:8080/wlsagent/WlsAgent?hostname=localhost&port=7001
+
+In the example above, the plugin is listening on the port 8080, and the target server on the port 7001.
+
+The above command produces the following output:
+
+3|Unable to get MBeanServerConnection for JMXServiceURL service:jmx:t3://localhost:7001/jndi/weblogic.management.mbeanservers.runtime
+
+That's fair enough, as we have to provide credentials to access to our WebLogic MBeanServer. Notice the first character of the command output string is the regular Nagios exit code (UNKNOWN in this case).
+
+In order to monitor your application servers, you can create a specific user on the WebLogic side, and make sure it belongs to the monitor group.
+
+Let's retry by adding the credentials :
+
+wget -q -O - 'http://localhost:8080/wlsagent/WlsAgent?hostname=localhost&port=7001&username=nagios&password=nagios' 
+
+This time, we get this output:
+
+0|server1: status OK|
+
+The Nagios exit code is 0 (OK), as we didn't perform any test. 'server1' is the name of our WebLogic instance.
+
+Next we're going to get information about the JVM heap usage by adding jvm=UsedMemory;80;90 to the request parameters :
+
+wget -q -O - 'http://localhost:8080/wlsagent/WlsAgent?hostname=localhost&port=7001&username=nagios&password=nagios&jvm=UsedMemory;80;90'
+
+The two numeric values at the end are the warning and critical thresholds for the memory usage, we will go back on this later.
+
+The command output is :
+
+0|server1: status OK|HeapSize=256M;;;0;512 UsedMemory=194M;;;0;512
+
+As you can see, we get the current heap size, the maximum heap size and the amount of memory currently used by the server.
+
+Let's try to change the warning threshold value to '30':
+
+wget -q -O - 'http://localhost:8080/wlsagent/WlsAgent?hostname=localhost&port=7001&username=nagios&password=nagios&jvm=UsedMemory;30;90'
+
+We get this:
+
+1|server1: status WARNING - Warning alert raised by the jvm test |HeapSize=256M;;;0;512 UsedMemory=200M;;;0;512
+
+A warning alert is raised by the test, as the ratio used memory / maximum memory is superior to 30% (our warning threshold).
