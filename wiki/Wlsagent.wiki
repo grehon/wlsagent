@@ -31,16 +31,16 @@ The content of the working directory should look like this :
 
 The lib directory contains the jar dependencies for Jetty and the !WebLogic implementation of the 't3' protocol :
 
- jetty-continuation-7.3.0.v20110203.jar
- jetty-http-7.3.0.v20110203.jar
- jetty-io-7.3.0.v20110203.jar
- jetty-security-7.3.0.v20110203.jar
- jetty-server-7.3.0.v20110203.jar
- jetty-servlet-7.3.0.v20110203.jar
- jetty-util-7.3.0.v20110203.jar
- servlet-api-2.5.jar
- wlclient.jar
- wljmxclient.jar
+ jetty-continuation-7.3.0.v20110203.jar<br>
+ jetty-http-7.3.0.v20110203.jar<br>
+ jetty-io-7.3.0.v20110203.jar<br>
+ jetty-security-7.3.0.v20110203.jar<br>
+ jetty-server-7.3.0.v20110203.jar<br>
+ jetty-servlet-7.3.0.v20110203.jar<br>
+ jetty-util-7.3.0.v20110203.jar<br>
+ servlet-api-2.5.jar<br>
+ wlclient.jar<br>
+ wljmxclient.jar<br>
 
 You can get the last Jetty distribution from the Eclipse site :
 
