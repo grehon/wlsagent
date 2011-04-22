@@ -21,7 +21,7 @@ for jar in $(find ${LIB_PATH} -name '*.jar'); do
   CLASSPATH=${CLASSPATH}:${jar};
 done
 
-${JAVA_HOME}/bin/java ${JAVA_OPTS} -Xmx32m -cp ${CLASSPATH} net.wait4it.wlsagent.WlsAgent "$@" > /dev/null 2>&1 &
+${JAVA_HOME}/bin/java -Xmx32m -cp ${CLASSPATH} net.wait4it.wlsagent.WlsAgent "$@" > /dev/null 2>&1 &
 }}}
 
 The content of the working directory should look like this :
