@@ -103,4 +103,4 @@ A warning alert is raised by the test, as the ratio used memory / maximum memory
 
 Here is below a sample of the kind of graph you can get with !HeapSize and !UsedMemory properties:
 
-https://picasaweb.google.com/lh/photo/xQiAujSATbG5t9USRjBhqv9tnqqPMvoRy2oW1QGrLH4?feat=directlink&nonsense=something_that_ends_with.jpg
+https://lh6.googleusercontent.com/_GD7v8WzxfNA/TbGe2-SFQ_I/AAAAAAAAAmo/raSsL_i6iCY/s400/nagios.jpg
