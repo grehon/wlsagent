@@ -25,6 +25,7 @@ import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
+
 import javax.naming.Context;
 
 /**
@@ -32,6 +33,7 @@ import javax.naming.Context;
  *
  */
 public class JmxConnectionFactory {
+
 	private static final String JNDI_NAME = "/jndi/weblogic.management.mbeanservers.runtime";
 
 	public static MBeanServerConnection getInstance(Map<String,String> params) {

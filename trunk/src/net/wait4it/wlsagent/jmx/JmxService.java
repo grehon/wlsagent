@@ -40,24 +40,12 @@ public class JmxService {
 		}
 	}
 
-	public static MBeanServerConnection getConnection(Map<String,String> params) {
-		MBeanServerConnection connection = null;
-		try {
-			connection = JmxConnectionFactory.getInstance(params);
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
-		}
-		return connection;
+	public static MBeanServerConnection getConnection(Map<String,String> params) throws Exception {
+		return JmxConnectionFactory.getInstance(params);
 	}
 
-	public static ObjectName getServerRuntime(MBeanServerConnection connection) {
-		ObjectName serverRuntimeMbean = null;
-		try {
-			serverRuntimeMbean = (ObjectName)connection.getAttribute(service, "ServerRuntime");
-		} catch (Exception e) {
-			throw new RuntimeException("Unable to get WebLogic ServerRuntimeMBean.");
-		}
-		return serverRuntimeMbean;
+	public static ObjectName getServerRuntime(MBeanServerConnection connection) throws Exception {
+		return (ObjectName)connection.getAttribute(service, "ServerRuntime");
 	}
 
 }
