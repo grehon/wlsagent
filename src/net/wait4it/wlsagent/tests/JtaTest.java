@@ -29,7 +29,7 @@ import net.wait4it.wlsagent.utils.Utils;
  * @author Yann Lambret
  *
  */
-public class JtaTest implements Test {
+public class JtaTest extends TestUtils implements Test {
 
 	private static final String MESSAGE = " jta test ";
 
@@ -57,7 +57,7 @@ public class JtaTest implements Test {
 			jtaRuntimeMbean = (ObjectName)connection.getAttribute(serverRuntimeMbean, "JTARuntime");
 			activeTransactionsTotalCount = (Long.parseLong(connection.getAttribute(jtaRuntimeMbean, "ActiveTransactionsTotalCount").toString()));
 			output.append("ActiveTransactions=" + activeTransactionsTotalCount + " ");
-			code = Utils.checkResult(activeTransactionsTotalCount, critical, warning, code);
+			code = checkResult(activeTransactionsTotalCount, critical, warning, code);
 		} catch (Exception e) {
 			result.setStatus(Status.UNKNOWN);
 			result.setMessage(Status.UNKNOWN.getMessage(MESSAGE));

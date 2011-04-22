@@ -32,7 +32,7 @@ import net.wait4it.wlsagent.utils.Utils;
  * @author Yann Lambret
  *
  */
-public class JdbcTest implements Test {
+public class JdbcTest extends TestUtils implements Test {
 
 	private static final String MESSAGE = " jdbc test ";
 
@@ -73,7 +73,7 @@ public class JdbcTest implements Test {
 					String[] thresholdsArray = datasources.get(datasourceName).split(";");
 					Long warning = Long.parseLong(thresholdsArray[0]);
 					Long critical = Long.parseLong(thresholdsArray[1]);
-					code = Utils.checkResult(waitingForConnectionCurrentCount, critical, warning, code);
+					code = checkResult(waitingForConnectionCurrentCount, critical, warning, code);
 				}
 			}
 		} catch (Exception e) {

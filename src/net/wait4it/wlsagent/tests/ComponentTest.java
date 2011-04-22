@@ -27,13 +27,12 @@ import javax.management.ObjectName;
 
 import net.wait4it.wlsagent.utils.Result;
 import net.wait4it.wlsagent.utils.Status;
-import net.wait4it.wlsagent.utils.Utils;
 
 /**
  * @author Yann Lambret
  *
  */
-public class ComponentTest implements Test {
+public class ComponentTest extends TestUtils implements Test {
 
 	private static final String MESSAGE = " component test ";
 
@@ -78,7 +77,7 @@ public class ComponentTest implements Test {
 						String[] thresholdsArray = components.get(contextRoot).split(";");
 						Long warning = Long.parseLong(thresholdsArray[0]);
 						Long critical = Long.parseLong(thresholdsArray[1]);
-						code = Utils.checkResult(openSessions, critical, warning, code);
+						code = checkResult(openSessions, critical, warning, code);
 					}
 				}
 			}

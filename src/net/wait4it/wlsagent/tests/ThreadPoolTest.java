@@ -29,7 +29,7 @@ import net.wait4it.wlsagent.utils.Utils;
  * @author Yann Lambret
  *
  */
-public class ThreadPoolTest implements Test {
+public class ThreadPoolTest extends TestUtils implements Test {
 
 	private static final String MESSAGE = " thread pool test ";
 
@@ -61,7 +61,7 @@ public class ThreadPoolTest implements Test {
 			threadIdleCount = Long.parseLong(connection.getAttribute(threadPoolRuntimeMbean, "ExecuteThreadIdleCount").toString());
 			threadActiveCount = threadTotalCount - threadIdleCount;
 			output.append("ThreadActiveCount=" + threadActiveCount + ";;;0;" + threadTotalCount + " ");
-			code = Utils.checkResult(threadActiveCount, threadTotalCount, critical, warning, code);
+			code = checkResult(threadActiveCount, threadTotalCount, critical, warning, code);
 		} catch (Exception e) {
 			result.setStatus(Status.UNKNOWN);
 			result.setMessage(Status.UNKNOWN.getMessage(MESSAGE));
