@@ -99,3 +99,8 @@ We get this:
 1|server1: status WARNING - Warning alert raised by the [jvm] test |!HeapSize=256M;;;0;512 !UsedMemory=200M;;;0;512
 
 A warning alert is raised by the test, as the ratio used memory / maximum memory is superior to 30% (our warning threshold).
+
+
+Here is below a sample of the kind of graph you can get with HeapSize and UsedMemory properties:
+
+https://picasaweb.google.com/lh/photo/xQiAujSATbG5t9USRjBhqv9tnqqPMvoRy2oW1QGrLH4?feat=directlink
