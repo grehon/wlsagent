@@ -29,7 +29,7 @@ import net.wait4it.wlsagent.utils.Utils;
  * @author Yann Lambret
  *
  */
-public class JvmTest implements Test {
+public class JvmTest extends TestUtils implements Test {
 
 	private static final String MESSAGE = " jvm test ";
 
@@ -64,7 +64,7 @@ public class JvmTest implements Test {
 			heapUsedCurrent = heapSizeCurrent - heapFreeCurrent;
 			output.append("HeapSize=" + heapSizeCurrent + "M;;;0;" + heapSizeMax + " ");
 			output.append("UsedMemory=" + heapUsedCurrent + "M;;;0;" + heapSizeMax + " ");
-			code = Utils.checkResult(heapUsedCurrent, heapSizeMax, critical, warning, code);
+			code = checkResult(heapUsedCurrent, heapSizeMax, critical, warning, code);
 		} catch (Exception e) {
 			result.setStatus(Status.UNKNOWN);
 			result.setMessage(Status.UNKNOWN.getMessage(MESSAGE));
@@ -80,13 +80,6 @@ public class JvmTest implements Test {
 		}
 
 		return result;
-	}
-
-	/**
-	 * Helpers
-	 */
-	private Long format(Long value) {
-		return ((value)/1024/1024);
 	}
 
 }
