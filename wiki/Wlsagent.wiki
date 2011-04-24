@@ -100,6 +100,7 @@ We get this:
 
 A warning alert is raised by the test, as the ratio used memory / maximum memory is superior to 30% (our warning threshold).
 
+=== Screenshots ===
 
 Here is below a sample of the kind of graph you can get with !HeapSize and !UsedMemory properties:
 
