@@ -59,9 +59,9 @@ public class ComponentTest extends TestUtils implements Test {
 
 		try {
 			applicationRuntimeMbeans = (ObjectName[])connection.getAttribute(serverRuntimeMbean, "ApplicationRuntimes");
-			for (ObjectName applicationRuntime:applicationRuntimeMbeans) {
+			for (ObjectName applicationRuntime : applicationRuntimeMbeans) {
 				ObjectName componentRuntimeMbeans[] = (ObjectName[])connection.getAttribute(applicationRuntime, "ComponentRuntimes");
-				for (ObjectName componentRuntime:componentRuntimeMbeans) {
+				for (ObjectName componentRuntime : componentRuntimeMbeans) {
 					String contextRoot = null;
 					try {
 						contextRoot = connection.getAttribute(componentRuntime, "ContextRoot").toString().substring(1);
