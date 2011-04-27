@@ -6,17 +6,17 @@ The jvm option allows you to monitor the !WebLogic server JVM heap usage.
 
 When sending a request to the plugin, you have to do something like this :
 
-&jvm=!UsedMemory;80;90&<some other parameter(s)>
+jvm=!UsedMemory;80;90&<some other parameter(s)>
 
 You will get an output similar to this:
 
 !HeapSize=256M;;;0;512 !UsedMemory=227M;;;0;512
 
-The !HeapSize is the current heap size at the time the test is performed. The !UsedMemory is the amount of memory used at the time the test is performed. Both values are given in MB, the minimal value is always 0, and the max value is the same for both properties (i.e. 'HeapSizeMax' attribute of the JVMRuntimeMBean).
+The !HeapSize is the current heap size at the time the test is performed. The !UsedMemory is the amount of memory used at the time the test is performed. Both values are given in MB, the minimal value is always 0, and the max value is the same for both properties (i.e. '!HeapSizeMax' attribute of the JVMRuntimeMBean).
 
 When using this option, you can specify 'warning' and 'critical' thresholds values. The comparison is made beetween the thresholds and the !UsedMemory / !HeapSizeMax ratio.
 
-So if the amount of memory used exceeds 80%, you will get something like this:
+So if the amount of memory used exceeds 80%, the output header should look like:
 
 1|server1: status WARNING - Warning alert raised by the jvm test |
 
