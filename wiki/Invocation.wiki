@@ -20,13 +20,12 @@ import os
 import string
 import sys
 
-params = sys.argv[1]
-
 hostname = os.getenv('WLSAGENT_HOST', 'localhost')
 port = os.getenv('WLSAGENT_PORT', '9090')
 uri = os.getenv('WLSAGENT_URI', '/wlsagent/WlsAgent')
 
 try:
+    params = sys.argv[1]
     connection=httplib.HTTPConnection(hostname + ":" + port, timeout=10)
     connection.request("GET", uri + '?' + params)
     response = connection.getresponse()
