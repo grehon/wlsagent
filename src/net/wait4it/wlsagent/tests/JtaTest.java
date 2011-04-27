@@ -23,7 +23,6 @@ import javax.management.ObjectName;
 
 import net.wait4it.wlsagent.utils.Result;
 import net.wait4it.wlsagent.utils.Status;
-import net.wait4it.wlsagent.utils.Utils;
 
 /**
  * @author Yann Lambret
