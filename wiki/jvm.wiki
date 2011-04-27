@@ -6,7 +6,7 @@ The jvm option allows you to monitor the !WebLogic server JVM heap usage.
 
 When sending a request to the plugin, you have to do something like this :
 
-jvm=!UsedMemory;80;90&<some other parameter(s)>
+`jvm=!UsedMemory;80;90&<some other parameter(s)>`
 
 You will get an output similar to this:
 
