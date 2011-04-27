@@ -44,7 +44,6 @@ public class JmxConnectionFactory {
 		map.put(Context.SECURITY_PRINCIPAL, params.get("username"));
 		map.put(Context.SECURITY_CREDENTIALS, params.get("password"));
 		map.put(JMXConnectorFactory.PROTOCOL_PROVIDER_PACKAGES, "weblogic.management.remote");
-		map.put("jmx.remote.x.request.waiting.timeout", "5000");
 		try {
 			url = new JMXServiceURL("service:jmx:t3://" + params.get("hostname") + ":" + params.get("port") + JNDI_NAME);
 			connector = JMXConnectorFactory.connect(url, map);

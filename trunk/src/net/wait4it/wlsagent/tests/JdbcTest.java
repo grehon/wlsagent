@@ -61,7 +61,7 @@ public class JdbcTest extends TestUtils implements Test {
 		try {
 			jdbcServiceRuntimeMbean = (ObjectName)connection.getAttribute(serverRuntimeMbean, "JDBCServiceRuntime");
 			jdbcDataSourceRuntimeMbeans = (ObjectName[])connection.getAttribute(jdbcServiceRuntimeMbean, "JDBCDataSourceRuntimeMBeans");
-			for (ObjectName datasourceRuntime:jdbcDataSourceRuntimeMbeans) {
+			for (ObjectName datasourceRuntime : jdbcDataSourceRuntimeMbeans) {
 				String datasourceName = connection.getAttribute(datasourceRuntime, "Name").toString();
 				if (datasources.containsKey(datasourceName)) {
 					Long currCapacity = Long.parseLong(connection.getAttribute(datasourceRuntime, "CurrCapacity").toString());
