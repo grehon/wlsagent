@@ -4,11 +4,11 @@
 
 The script below just takes the GET request parameters as arguments. You can use it like this:
 
-./wlsagent.py 'hostname=localhost&port=7001&username=nagios&password=nagios&jvm=UsedMemory;80;90'
+./wlsagent.py 'hostname=localhost&port=7001&username=nagios&password=nagios&jvm=!UsedMemory;80;90'
 
 The output would look like this:
 
-server1: status OK|HeapSize=247M;;;0;494 UsedMemory=114M;;;0;494
+server1: status OK|!HeapSize=247M;;;0;494 !UsedMemory=114M;;;0;494
 
 ...and the script exit value would be 0.
 
