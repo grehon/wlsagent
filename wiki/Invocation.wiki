@@ -1,6 +1,6 @@
 #summary This page provides some script samples for handling monitoring requests
 
-= Python sample script =
+=== Python sample script ===
 
 The script below just takes the GET request parameters as arguments. You can use it like this:
 
