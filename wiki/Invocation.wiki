@@ -1,0 +1,40 @@
+#summary This page provides some script samples for handling monitoring requests
+
+= Python sample script =
+
+The script below just takes the GET request parameters as arguments. You can use it like this:
+
+./wlsagent.py 'hostname=localhost&port=7001&username=nagios&password=nagios&jvm=UsedMemory;80;90'
+
+The output would look like this:
+
+server1: status OK|HeapSize=247M;;;0;494 UsedMemory=114M;;;0;494
+
+...and the script exit value would be 0.
+
+{{{
+#!/usr/bin/python
+
+import httplib
+import os
+import string
+import sys
+
+params = sys.argv[1]
+
+hostname = os.getenv('WLSAGENT_HOST', 'localhost')
+port = os.getenv('WLSAGENT_PORT', '9090')
+uri = os.getenv('WLSAGENT_URI', '/wlsagent/WlsAgent')
+
+try:
+    connection=httplib.HTTPConnection(hostname + ":" + port, timeout=10)
+    connection.request("GET", uri + '?' + params)
+    response = connection.getresponse()
+    response = response.read().split('|', 1)
+    code = response.pop(0)
+    print string.join(response).strip()
+    sys.exit(int(code))
+except Exception, e:
+    print e
+    sys.exit(3)
+}}}
