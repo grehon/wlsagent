@@ -6,11 +6,11 @@ The thread-pool option allows you to monitor the !WebLogic server thread pool us
 
 When sending a request to the plugin, you have to give the following parameters:
 
-`thread-pool=!ThreadActiveCount;90;95&<some other parameter(s)>`
+`thread-pool=ThreadActiveCount;90;95&<some other parameter(s)>`
 
 You will get an output similar to this:
 
-`!ThreadActiveCount=2;;;0;16`
+`ThreadActiveCount=2;;;0;16`
 
 The !ThreadActiveCount value is the active thread count at the time the test is performed. The minimal value is always 0, and the max value is the total thread count in the pool at the time the test is performed (i.e. '!ExecuteThreadTotalCount' attribute of the ThreadPoolRuntimeMBean).
 
