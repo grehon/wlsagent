@@ -1,0 +1,25 @@
+#summary This page details the jta option usage
+
+=== jta option ===
+
+The jta option allows you to monitor the !WebLogic server JTA transactions.
+
+When sending a request to the plugin, you have to give the following parameters:
+
+`jta=ActiveTransactions;50;75&<some other parameter(s)>`
+
+You will get an output similar to this:
+
+`ActiveTransactions=3`
+
+The !ActiveTransactions value is the active transactions count at the time the test is performed.
+
+When using this option, you can specify 'warning' and 'critical' thresholds values (50 and 75 in the example above). These are absolute values, and the comparison will be made beetween the ActiveTransactions value and the threshold value.
+
+So if the number of active transactions is beetween 50 and 75, the output header should look like:
+
+`1|server1: status WARNING - Warning alert raised by the jta test |`
+
+Beyond 75, you will get this output:
+
+`2|server1: status CRITICAL - Critical alert raised by the jta test |`
