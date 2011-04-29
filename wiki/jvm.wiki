@@ -1,6 +1,6 @@
 #summary This page details the jvm option usage
 
-=== JVM Option ===
+=== jvm option ===
 
 The jvm option allows you to monitor the !WebLogic server JVM heap usage.
 
