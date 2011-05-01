@@ -78,7 +78,7 @@ This time, we get this output:
 
 The Nagios exit code is 0 (OK), as we didn't perform any test. 'server1' is the name of our !WebLogic instance.
 
-Next we're going to get information about the JVM heap usage by adding [jvm]=!UsedMemory;80;90 to the request parameters :
+Next we're going to get information about the JVM heap usage by adding [Jvm jvm]=!UsedMemory;80;90 to the request parameters :
 
 wget -q -O - 'http://localhost:8080/wlsagent/WlsAgent?hostname=localhost&port=7001&username=nagios&password=nagios&jvm=UsedMemory;80;90'
 
