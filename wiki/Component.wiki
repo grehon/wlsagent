@@ -6,7 +6,7 @@ The component option allows you to monitor the active HTTP sessions count for an
 
 You can use this option this way:
 
-`component=app1;100;120|app1;200;250&<some other parameter(s)>`
+`component=app1;100;120|app2;200;250&<some other parameter(s)>`
 
 Notice that 'app1' and 'app2' must be the exact context root of your application. The numbers that follow the context root are 'warning' and 'critical' threshold values.
 
