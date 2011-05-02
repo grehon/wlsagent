@@ -20,12 +20,17 @@ import os
 import string
 import sys
 
+if len(sys.argv[1:]) != 1:
+    print "Usage: wlsagent.py 'param1=value<;w;c>&param2=value2<;w;c>&...&parmamN=value<;w;c>'"
+    sys.exit(3)
+
+params = sys.argv[1]
+
 hostname = os.getenv('WLSAGENT_HOST', 'localhost')
 port = os.getenv('WLSAGENT_PORT', '9090')
 uri = os.getenv('WLSAGENT_URI', '/wlsagent/WlsAgent')
 
 try:
-    params = sys.argv[1]
     connection=httplib.HTTPConnection(hostname + ":" + port, timeout=10)
     connection.request("GET", uri + '?' + params)
     response = connection.getresponse()
