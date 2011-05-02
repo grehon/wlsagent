@@ -1,0 +1,23 @@
+#summary This page details the component option usage
+
+=== component option ===
+
+The component option allows you to monitor the active HTTP sessions count for any web module.
+
+You can use this option this way:
+
+`component=app1;100;120|app1;200;250&<some other parameter(s)>`
+
+Notice that 'app1' and 'app2' must be the exact context root of your application. The numbers that follow the context root are 'warning' and 'critical' threshold values.
+
+With the above example, you will get this kind of output:
+
+`app1=89 app2=128`
+
+When using this option, you can specify 'warning' and 'critical' threshold values. The comparison is made beetween the thresholds and the active sessions count.
+
+Messages look like this:
+
+`1|server1: status WARNING - Warning alert raised by the component test |`
+
+`2|server1: status CRITICAL - Critical alert raised by the component test |`
