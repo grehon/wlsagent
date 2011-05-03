@@ -104,6 +104,6 @@ See [Invocation] page of this wiki for script samples.
 
 === Screenshots ===
 
-Here is below a sample of the kind of graph you can get with !HeapSize and !UsedMemory properties:
+Here is below a sample of the kind of graph you can get with !HeapSize and !UsedMemory properties (generated with PNP4Nagios):
 
 https://lh6.googleusercontent.com/_GD7v8WzxfNA/TbGe2-SFQ_I/AAAAAAAAAmo/raSsL_i6iCY/s400/nagios.jpg
