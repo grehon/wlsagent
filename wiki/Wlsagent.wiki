@@ -140,7 +140,7 @@ esac
 
 === Running the plugin ===
 
-First of all, you have to run the plugin. This script will do the job (make sure JAVA_HOME variable is defined):
+This script will do the job (make sure JAVA_HOME variable is defined):
 
 {{{
 #!/bin/bash
