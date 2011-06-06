@@ -2,7 +2,7 @@
 
 === jvm option ===
 
-The jvm option allows you to monitor the !WebLogic server JVM heap usage.
+The jvm option allows you to monitor the !WebLogic server JVM heap usage (works with both JRockit and Sun JVMs).
 
 When sending a request to the plugin, you have to do something like this :
 
