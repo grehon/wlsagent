@@ -69,4 +69,4 @@ Assuming the file wlsagent.conf contains the following:
 
 export WLSAGENT_HOST="localhost"<br>
 export WLSAGENT_PORT="9090"<br>
-export WLSAGENT_URI="wlsagent/WlsAgent"<br>
+export WLSAGENT_URI="wlsagent/!WlsAgent"<br>
