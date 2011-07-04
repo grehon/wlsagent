@@ -126,11 +126,11 @@ The above command produces the following output:
 
 That's fair enough, as we have to provide credentials to access our !WebLogic MBeanServer. Notice the first character of the command output string is the regular Nagios exit code (UNKNOWN in this case).
 
-In order to monitor your application servers, you can create a specific user on the !WebLogic side, and make sure it belongs to the monitor group.
+In order to monitor your application servers, you can create a specific user on the !WebLogic side, and make sure it belongs to the monitor group. This is particularly important if your WebLogic domain is secured with SSL, as an administrative user can't use an non-administrative port.
 
 Let's retry by adding the credentials :
 
-wget -q -O - 'http://localhost:8080/wlsagent/WlsAgent?hostname=localhost&port=7001&username=nagios&password=nagios' 
+wget -q -O - 'http://localhost:9090/wlsagent/WlsAgent?hostname=localhost&port=7001&username=nagios&password=nagios' 
 
 This time, we get this output:
 
@@ -140,11 +140,11 @@ The Nagios exit code is 0 (OK), as we didn't perform any test. 'server1' is the 
 
 Next we're going to get information about the JVM heap usage by adding [Jvm jvm]=!UsedMemory;80;90 to the request parameters :
 
-wget -q -O - 'http://localhost:8080/wlsagent/WlsAgent?hostname=localhost&port=7001&username=nagios&password=nagios&jvm=UsedMemory;80;90'
+wget -q -O - 'http://localhost:9090/wlsagent/WlsAgent?hostname=localhost&port=7001&username=nagios&password=nagios&jvm=UsedMemory;80;90'
 
 The two numeric values at the end are the warning and critical thresholds for the memory usage, we will go back on this later.
 
-The command output is :
+The command output is:
 
 0|server1: status OK|!HeapSize=256M;;;0;512 !UsedMemory=194M;;;0;512
 
@@ -152,7 +152,7 @@ As you can see, we get the current heap size, the maximum heap size and the amou
 
 Let's try to change the warning threshold value to '30':
 
-wget -q -O - 'http://localhost:8080/wlsagent/WlsAgent?hostname=localhost&port=7001&username=nagios&password=nagios&jvm=UsedMemory;30;90'
+wget -q -O - 'http://localhost:9090/wlsagent/WlsAgent?hostname=localhost&port=7001&username=nagios&password=nagios&jvm=UsedMemory;30;90'
 
 We get this:
 
