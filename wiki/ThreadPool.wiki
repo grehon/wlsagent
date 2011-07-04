@@ -16,4 +16,4 @@ In this generic example, 'w' and 'c' are warning and critical values. The !Threa
 ThreadPoolSize=16 ThreadActiveCount=5;;;0;16 Throughput=14.31
 }}}
 
-The !ThreadPoolSize value is the total number of threads in the pool. The !ThreadActiveCount value is the active thread count at the time the test is performed. The minimal value is always 0, and the max value is the !ThreadPoolSize value (i.e. '!ExecuteThreadTotalCount' attribute of the ThreadPoolRuntimeMBean). The !Throughput value is the mean number of requests completed per second.
+The !ThreadPoolSize value is the total number of threads in the pool. The !ThreadActiveCount value is the active thread count at the time the test is performed. The minimal value is always 0, and the max value is the !ThreadPoolSize value (i.e. '!ExecuteThreadTotalCount' attribute of the ThreadPoolRuntimeMBean). The Throughput value is the mean number of requests completed per second.
