@@ -25,9 +25,9 @@ package net.wait4it.wlsagent.utils;
 public enum Status {
 
 	OK       ( 0, "" ),
-	UNKNOWN  ( 3, "Unknown status for the" ),
 	WARNING  ( 1, "Warning alert raised by the" ),
-	CRITICAL ( 2, "Critical alert raised by the" );
+	CRITICAL ( 2, "Critical alert raised by the" ),
+	UNKNOWN  ( 3, "Unknown status for the" );
 
 	private Integer code;
 	private String message;
