@@ -36,7 +36,7 @@ public class JmxConnectionFactory {
 
 	private static final String JNDI_NAME = "/jndi/weblogic.management.mbeanservers.runtime";
 
-	public static MBeanServerConnection getInstance(Map<String,String> params) {
+	public static MBeanServerConnection getInstance(Map<String,String> params) throws Exception {
 		HashMap<String,String> map = new HashMap<String,String>();
 		JMXServiceURL url = null;
 		JMXConnector connector = null;
@@ -44,13 +44,9 @@ public class JmxConnectionFactory {
 		map.put(Context.SECURITY_PRINCIPAL, params.get("username"));
 		map.put(Context.SECURITY_CREDENTIALS, params.get("password"));
 		map.put(JMXConnectorFactory.PROTOCOL_PROVIDER_PACKAGES, "weblogic.management.remote");
-		try {
-			url = new JMXServiceURL("service:jmx:t3://" + params.get("hostname") + ":" + params.get("port") + JNDI_NAME);
-			connector = JMXConnectorFactory.connect(url, map);
-			connection = connector.getMBeanServerConnection();
-		} catch (Exception e) {
-			throw new RuntimeException("Unable to get MBeanServerConnection for JMXServiceURL " + url.toString());
-		}
+		url = new JMXServiceURL("service:jmx:t3://" + params.get("hostname") + ":" + params.get("port") + JNDI_NAME);
+		connector = JMXConnectorFactory.connect(url, map);
+		connection = connector.getMBeanServerConnection();
 		return connection;
 	}
 

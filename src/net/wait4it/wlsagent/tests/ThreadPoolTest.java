@@ -18,6 +18,8 @@
 
 package net.wait4it.wlsagent.tests;
 
+import java.text.DecimalFormat;
+
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
@@ -44,8 +46,10 @@ public class ThreadPoolTest extends TestUtils implements Test {
 		Long threadTotalCount = null;
 		Long threadIdleCount = null;
 		Long threadActiveCount = null;
+		Double throughput = null;
 		Long warning = null;
 		Long critical = null;
+		DecimalFormat df = new DecimalFormat("0.00");
 
 		/**
 		 * Parse parameters
@@ -59,7 +63,10 @@ public class ThreadPoolTest extends TestUtils implements Test {
 			threadTotalCount = Long.parseLong(connection.getAttribute(threadPoolRuntimeMbean, "ExecuteThreadTotalCount").toString());
 			threadIdleCount = Long.parseLong(connection.getAttribute(threadPoolRuntimeMbean, "ExecuteThreadIdleCount").toString());
 			threadActiveCount = threadTotalCount - threadIdleCount;
+			throughput = Double.parseDouble(connection.getAttribute(threadPoolRuntimeMbean, "Throughput").toString());
+			output.append("ThreadPoolSize=" + threadTotalCount + " ");
 			output.append("ThreadActiveCount=" + threadActiveCount + ";;;0;" + threadTotalCount + " ");
+			output.append("Throughput=" + df.format(throughput) + " ");
 			code = checkResult(threadActiveCount, threadTotalCount, critical, warning, code);
 		} catch (Exception e) {
 			result.setStatus(Status.UNKNOWN);
@@ -79,3 +86,4 @@ public class ThreadPoolTest extends TestUtils implements Test {
 	}
 
 }
+
