@@ -2,24 +2,29 @@
 
 === jdbc option ===
 
-The jdbc option allows you to monitor the !WebLogic server JDBC datasources usage.
+  * Invocation
 
-When sending a request to the plugin, you have to do something like this :
+{{{
+jdbc=<datasource 1>;w;c|<datasource 2>;w;c|...|<datasource N>;w;c
+}}}
 
-`jdbc=ds1;2;4|ds2;2;4&<some other parameter(s)>`
+In this generic example, 'datasource 1' ... 'datasource N' would be jdbc datasource names, and 'w' and 'c' would be warning and critical thresholds.
 
-ds1 and ds2 would be your datasource names, and '2' and '4' would be 'warning' and 'critical' thresholds for both of them.
+So you could have for instance:
 
-With the above example, you will get this kind of output:
+{{{
+jdbc=jdbc/ds1;2;5|jdbc/ds2;2;5
+}}}
 
-`jdbc-ds1-capacity=1 jdbc-ds1-active=0 jdbc-ds1-waiting=0 jdbc-ds2-capacity=8 jdbc-ds2-active=2 jdbc-ds2-waiting=0`
+When using this option, you can specify 'warning' and 'critical' threshold values. The comparison is made beetween the thresholds and the 'waiting' value. So for the ds2 datasource, a warning alert will be raised if 10 or 11 active connections are required by the application, and a critical alert will be raised for 12 active connections required or more.
 
-The capacity value is the current jdbc pool size at the time the test is performed. The active value is the number of active JDBC connections for the monitored datasource, and the waiting value corresponds to the number of threads waiting for a connection from the pool.
 
-When using this option, you can specify 'warning' and 'critical' threshold values. The comparison is made beetween the thresholds and the 'waiting' value. So for the ds2 datasource, a warning alert will be raised if 10 or 11 active connections are required by the application, and a critical alert will be raised for 12 active connections required or more.  
 
-Messages look like this:
 
-`1|server1: status WARNING - Warning alert raised by the jdbc test |`
+  * Output
 
-`2|server1: status CRITICAL - Critical alert raised by the jdbc test |`
+{{{
+jdbc-jdbc/ds1-capacity=1 jdbc-jdbc/ds1-active=0 jdbc-jdbc/ds1-waiting=0 jdbc-jdbc/ds2-capacity=8 jdbc-jdbc/ds2-active=2 jdbc-jdbc/ds2-waiting=0
+}}}
+
+The capacity value is the current jdbc pool size at the time the test is performed. The active value is the number of active JDBC connections for the monitored datasource, and the waiting value corresponds to the number of threads waiting for a connection from the pool. This last value is used to raise an alert.
