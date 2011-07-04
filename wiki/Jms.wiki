@@ -4,22 +4,18 @@
 
 The jms option allows you to monitor the !WebLogic server JMS queues and topics usage.
 
-You can use this option the following way:
+  * Invocation
 
-`jms=DistributedQueue0;150;200|DistributedTopic0;150;200&<some other parameter(s)>`
+{{{
+jms=DistributedQueue0;150;200|DistributedTopic0;150;200
+}}}
 
-DistributedQueue0 and DistributedTopic0 would be your JMS resources !WebLogic names, and '150' and '200' would be 'warning' and 'critical' thresholds for both of them.
+!DistributedQueue0 and !DistributedTopic0 would be your JMS resources !WebLogic names, and '150' and '200' would be 'warning' and 'critical' thresholds for both of them.
 
-With the above example, you will get this kind of output:
+  * Output
 
-`jms-DistributedQueue0-current=2 jms-DistributedQueue0-pending=0 jms-DistributedTopic0-current=0 jms-DistributedTopic0-pending=0`
+{{{
+jms-DistributedQueue0-current=2 jms-DistributedQueue0-pending=0 jms-DistributedTopic0-current=0 jms-DistributedTopic0-pending=0
+}}}
 
-The 'current' value is the current number of messages in the destination, and the 'pending' value is the pending number of messages in the destination (non committed or acknowledged messages).
-
-When using this option, you can specify 'warning' and 'critical' threshold values. The comparison is made beetween the thresholds and the 'current' value. So for the DistributedQueue0 queue, a warning alert will be raised if the current number of messages in the destination is beetween 150 and 200.  
-
-Messages look like this:
-
-`1|server1: status WARNING - Warning alert raised by the jms test |`
-
-`2|server1: status CRITICAL - Critical alert raised by the jms test |`
+The 'current' value is the current number of messages in the destination, and the 'pending' value is the pending number of messages in the destination (non committed or acknowledged messages). The 'current' value is used to raise an alert. So for the DistributedQueue0 queue, a warning alert will be raised if the current number of messages in the destination is beetween 150 and 200.
