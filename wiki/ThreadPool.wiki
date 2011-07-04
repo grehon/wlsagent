@@ -2,24 +2,18 @@
 
 === thread-pool option ===
 
-The thread-pool option allows you to monitor the !WebLogic server thread pool usage.
+  * Invocation
 
-When sending a request to the plugin, you have to give the following parameters:
+{{{
+thread-pool=ThreadActiveCount;w;c
+}}}
 
-`thread-pool=ThreadActiveCount;90;95&<some other parameter(s)>`
+In this generic example, 'w' and 'c' are warning and critical values. The !ThreadActiveCount / !ThreadPoolSize ratio will be compared to these values.
 
-You will get an output similar to this:
+  * Output
 
-`ThreadActiveCount=2;;;0;16`
+{{{
+ThreadPoolSize=16 ThreadActiveCount=5;;;0;16
+}}}
 
-The !ThreadActiveCount value is the active thread count at the time the test is performed. The minimal value is always 0, and the max value is the total thread count in the pool at the time the test is performed (i.e. '!ExecuteThreadTotalCount' attribute of the ThreadPoolRuntimeMBean).
-
-When using this option, you can specify 'warning' and 'critical' threshold values (90 and 95 in the example above). The comparison is made beetween the thresholds and the !ThreadActiveCount / !ThreadTotalCount ratio.
-
-So if the percentage of active threads exceeds 90%, the output header should look like:
-
-`1|server1: status WARNING - Warning alert raised by the thread pool test |`
-
-Beyond 95%, you will get this output:
-
-`2|server1: status CRITICAL - Critical alert raised by the thread pool test |`
+The !ThreadPoolSize value is the total number of threads in the pool. The !ThreadActiveCount value is the active thread count at the time the test is performed. The minimal value is always 0, and the max value is the !ThreadPoolSize value (i.e. '!ExecuteThreadTotalCount' attribute of the ThreadPoolRuntimeMBean).
