@@ -28,6 +28,8 @@ Notice the 'warning' and 'critical' thresholds will be the same for all datasour
 
   * Output
 
+The output would be the same for the two above invocations (assuming these only two datasources are configured on you target server):
+
 {{{
 jdbc-jdbc/ds1-capacity=1 jdbc-jdbc/ds1-active=0 jdbc-jdbc/ds1-waiting=0 jdbc-jdbc/ds2-capacity=8 jdbc-jdbc/ds2-active=2 jdbc-jdbc/ds2-waiting=0
 }}}
