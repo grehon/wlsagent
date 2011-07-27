@@ -27,7 +27,6 @@ import net.wait4it.wlsagent.jmx.JmxService;
 import net.wait4it.wlsagent.tests.ServerNameTest;
 import net.wait4it.wlsagent.utils.Option;
 import net.wait4it.wlsagent.utils.Result;
-import net.wait4it.wlsagent.utils.Status;
 
 /**
  * @author Yann Lambret
