@@ -8,6 +8,8 @@ You can get the performance data by submitting simple HTTP requests to the plugi
 
 === Building the plugin ===
 
+*Ant build*
+
 The files provided in the 'Downloads' section have been compiled with a 1.6 SDK and Jetty 7.3.0 dependencies. If you want to build the plugin by yourself, just follow these steps:
 
   * Download the last jetty distribution [http://www.eclipse.org/jetty/downloads.php here].
@@ -64,6 +66,111 @@ The files provided in the 'Downloads' section have been compiled with a 1.6 SDK 
 }}}
 
   * Run ant.
+
+*Maven build*
+
+Kiril Dunn submitted this nice contribution for those who would like to use Maven to build the project. It requires that you add the two WebLogic runtime dependencies (wljmxclient.jar and wlclient.jar) to your local repository (see Maven documentation [http://maven.apache.org/general.html#importing-jars here]). The advantage of this solution is that you will get a unique jar featuring all the required dependencies.
+
+Just adapt the following pom.xml to suit your needs:
+
+{{{
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>net.wait4it</groupId>
+    <artifactId>wlsagent</artifactId>
+    <version>r76</version>
+
+    <properties>
+        <jetty.version>7.4.4.v20110707</jetty.version>
+    </properties>
+
+    <build>
+        <sourceDirectory>src</sourceDirectory>
+
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <mainClass>net.wait4it.wlsagent.WlsAgent</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>weblogic</groupId>
+            <artifactId>wlclient</artifactId>
+            <version>9.2</version>
+        </dependency>
+        <dependency>
+            <groupId>weblogic</groupId>
+            <artifactId>wljmxclient</artifactId>
+            <version>9.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-continuation</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-http</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-io</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-security</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-servlet</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-util</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+    </dependencies>
+</project>
+}}}
 
 === Running the plugin ===
 
