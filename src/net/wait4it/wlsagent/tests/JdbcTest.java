@@ -46,6 +46,7 @@ public class JdbcTest extends TestUtils implements Test {
 		Map<String,String> datasources = new HashMap<String,String>();
 		ObjectName jdbcServiceRuntimeMbean = null;
 		ObjectName jdbcDataSourceRuntimeMbeans[] = null;
+		String[] thresholdsArray = null;
 
 		/**
 		 * Populate the HashMap with datasource name keys
@@ -62,14 +63,19 @@ public class JdbcTest extends TestUtils implements Test {
 			jdbcDataSourceRuntimeMbeans = (ObjectName[])connection.getAttribute(jdbcServiceRuntimeMbean, "JDBCDataSourceRuntimeMBeans");
 			for (ObjectName datasourceRuntime : jdbcDataSourceRuntimeMbeans) {
 				String datasourceName = connection.getAttribute(datasourceRuntime, "Name").toString();
-				if (datasources.containsKey(datasourceName)) {
+				if (datasources.containsKey("*") || datasources.containsKey(datasourceName)) {
 					Long currCapacity = Long.parseLong(connection.getAttribute(datasourceRuntime, "CurrCapacity").toString());
 					Long activeConnectionsCurrentCount = Long.parseLong(connection.getAttribute(datasourceRuntime, "ActiveConnectionsCurrentCount").toString());
 					Long waitingForConnectionCurrentCount = Long.parseLong(connection.getAttribute(datasourceRuntime, "WaitingForConnectionCurrentCount").toString());
 					output.append("jdbc-" + datasourceName + "-capacity" + "=" + currCapacity + " ");
 					output.append("jdbc-" + datasourceName + "-active" + "=" + activeConnectionsCurrentCount + " ");
 					output.append("jdbc-" + datasourceName + "-waiting" + "=" + waitingForConnectionCurrentCount + " ");
-					String[] thresholdsArray = datasources.get(datasourceName).split(";");
+
+					if (datasources.containsKey("*"))
+						thresholdsArray = datasources.get("*").split(";");
+					else
+						thresholdsArray = datasources.get(datasourceName).split(";");
+
 					Long warning = Long.parseLong(thresholdsArray[0]);
 					Long critical = Long.parseLong(thresholdsArray[1]);
 					code = checkResult(waitingForConnectionCurrentCount, critical, warning, code);
