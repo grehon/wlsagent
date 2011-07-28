@@ -26,4 +26,4 @@ With the above example, you will get this kind of output:
 app1=89 app2=128
 }}}
 
-The output gives the current active HTTP session count for each application specified by the user. If you're using a wildcard, WebLogic internal components won't appear in the application list.
+The output gives the current active HTTP session count for each application specified by the user. If you're using a wildcard, !WebLogic internal components won't appear in the application list.
