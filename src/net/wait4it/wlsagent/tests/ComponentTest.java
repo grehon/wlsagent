@@ -18,7 +18,9 @@
 
 package net.wait4it.wlsagent.tests;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.management.AttributeNotFoundException;
@@ -46,6 +48,17 @@ public class ComponentTest extends TestUtils implements Test {
 		 */
 		Map<String,String> components = new HashMap<String,String>();
 		ObjectName applicationRuntimeMbeans[] = null;
+		String[] thresholdsArray = null;
+		// No statistics for WLS internal components
+		List<String> exclusions = new ArrayList<String>();
+		exclusions.add("_async");
+		exclusions.add("bea_wls_deployment_internal");
+		exclusions.add("bea_wls_diagnostics");
+		exclusions.add("bea_wls_internal");
+		exclusions.add("console");
+		exclusions.add("consolehelp");
+		exclusions.add("uddi");
+		exclusions.add("uddiexplorer");
 
 		/**
 		 * Populate the HashMap with ContextRoot keys
@@ -71,10 +84,17 @@ public class ComponentTest extends TestUtils implements Test {
 						 */
 						continue;
 					}
-					if (components.containsKey(contextRoot)) {
+					if (exclusions.contains(contextRoot))
+						continue;
+					if (components.containsKey("*") || components.containsKey(contextRoot)) {
 						Long openSessions = Long.parseLong(connection.getAttribute(componentRuntime, "OpenSessionsCurrentCount").toString());
 						output.append("app-" + contextRoot + "=" + openSessions + " ");
-						String[] thresholdsArray = components.get(contextRoot).split(";");
+
+						if (components.containsKey("*"))
+							thresholdsArray = components.get("*").split(";");
+						else
+							thresholdsArray = components.get(contextRoot).split(";");
+
 						Long warning = Long.parseLong(thresholdsArray[0]);
 						Long critical = Long.parseLong(thresholdsArray[1]);
 						code = checkResult(openSessions, critical, warning, code);
