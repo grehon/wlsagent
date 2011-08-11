@@ -18,13 +18,18 @@
 
 package net.wait4it.wlsagent.tests;
 
+import java.util.regex.Pattern;
+
 /**
  * @author Yann Lambret
- *
+ * @author Kiril Dunn
  */
 public abstract class TestUtils {
+    protected static final Pattern AT_PATTERN = Pattern.compile("@");
+    protected static final Pattern PIPE_PATTERN = Pattern.compile("\\|");
+    protected static final Pattern SEMICOLON_PATTERN = Pattern.compile(";");
 
-	public static Integer checkResult(Long n1, Long n2, Long critical, Long warning, Integer code) {
+	public static int checkResult(long n1, long n2, long critical, long warning, int code) {
 		if (isCritical(n1, n2, critical)) {
 			code = 2;
 		} else if (isWarning(n1, n2, warning) && code == 0) {
@@ -33,7 +38,7 @@ public abstract class TestUtils {
 		return code;
 	}
 
-	public static Integer checkResult(Long n, Long critical, Long warning, Integer code) {
+	public static int checkResult(long n, long critical, long warning, int code) {
 		if (isCritical(n, critical)) {
 			code = 2;
 		} else if (isWarning(n, warning) && code == 0) {
@@ -42,30 +47,30 @@ public abstract class TestUtils {
 		return code;
 	}
 
-	public static Long format(Long value) {
-		return ((value)/1024/1024);
+	public static long format(Long value) {
+		return value / 1024 / 1024;
 	}
 
-	private static boolean isCritical(Long n1, Long n2, Long critical) {
-		Long ratio = ratio(n1, n2);
+	private static boolean isCritical(long n1, long n2, long critical) {
+		long ratio = ratio(n1, n2);
 		return ratio >= critical;
 	}
 
-	private static boolean isCritical(Long n, Long critical) {
+	private static boolean isCritical(long n, long critical) {
 		return n >= critical;
 	}
 
-	private static boolean isWarning(Long n1, Long n2, Long warning) {
-		Long ratio = ratio(n1, n2);
+	private static boolean isWarning(long n1, long n2, long warning) {
+		long ratio = ratio(n1, n2);
 		return ratio >= warning;
 	}
 
-	private static boolean isWarning(Long n, Long warning) {
+	private static boolean isWarning(long n, long warning) {
 		return n >= warning;
 	}
 
-	private static Long ratio(Long n1, Long n2) {
-		return Math.round(((n1.doubleValue())/(n2.doubleValue()))*100);
+	private static long ratio(long n1, long n2) {
+		return Math.round((double) n1 / (double) n2 * 100.0);
 	}
 
 }

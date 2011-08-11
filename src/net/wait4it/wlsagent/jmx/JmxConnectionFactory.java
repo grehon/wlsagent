@@ -13,7 +13,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Wlsagent. If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  */
 
 package net.wait4it.wlsagent.jmx;
@@ -30,17 +30,20 @@ import javax.naming.Context;
 
 /**
  * @author Yann Lambret
- *
+ * @author Kiril Dunn
  */
 public class JmxConnectionFactory {
 
 	private static final String JNDI_NAME = "/jndi/weblogic.management.mbeanservers.runtime";
 
-	public static MBeanServerConnection getInstance(Map<String,String> params) throws Exception {
-		HashMap<String,String> map = new HashMap<String,String>();
-		JMXServiceURL url = null;
-		JMXConnector connector = null;
-		MBeanServerConnection connection = null;	
+    private JmxConnectionFactory() {
+    }
+
+    public static MBeanServerConnection getInstance(Map<String,String> params) throws Exception {
+		Map<String, String> map = new HashMap<String,String>(10);
+		JMXServiceURL url;
+		JMXConnector connector;
+		MBeanServerConnection connection;
 		map.put(Context.SECURITY_PRINCIPAL, params.get("username"));
 		map.put(Context.SECURITY_CREDENTIALS, params.get("password"));
 		map.put(JMXConnectorFactory.PROTOCOL_PROVIDER_PACKAGES, "weblogic.management.remote");
@@ -49,5 +52,4 @@ public class JmxConnectionFactory {
 		connection = connector.getMBeanServerConnection();
 		return connection;
 	}
-
 }

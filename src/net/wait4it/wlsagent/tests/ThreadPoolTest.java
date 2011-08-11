@@ -28,7 +28,7 @@ import net.wait4it.wlsagent.utils.Status;
 
 /**
  * @author Yann Lambret
- *
+ * @author Kiril Dunn
  */
 public class ThreadPoolTest extends TestUtils implements Test {
 
@@ -36,25 +36,25 @@ public class ThreadPoolTest extends TestUtils implements Test {
 
 	public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
 		Result result = new Result();
-		StringBuilder output = new StringBuilder();
-		Integer code = 0;
+		StringBuilder output = new StringBuilder(100);
+		int code = 0;
 
 		/**
 		 * Specific test variables
 		 */
-		ObjectName threadPoolRuntimeMbean = null;
-		Long threadTotalCount = null;
-		Long threadIdleCount = null;
-		Long threadActiveCount = null;
-		Double throughput = null;
-		Long warning = null;
-		Long critical = null;
+		ObjectName threadPoolRuntimeMbean;
+		long threadTotalCount;
+		long threadIdleCount;
+		long threadActiveCount;
+		long warning;
+		long critical;
+        double throughput;
 		DecimalFormat df = new DecimalFormat("0.00");
 
 		/**
 		 * Parse parameters
 		 */
-		String[] paramsArray = params.split(";");
+		String[] paramsArray = SEMICOLON_PATTERN.split(params);
 		warning = Long.parseLong(paramsArray[1]);
 		critical = Long.parseLong(paramsArray[2]);
 
@@ -64,21 +64,28 @@ public class ThreadPoolTest extends TestUtils implements Test {
 			threadIdleCount = Long.parseLong(connection.getAttribute(threadPoolRuntimeMbean, "ExecuteThreadIdleCount").toString());
 			threadActiveCount = threadTotalCount - threadIdleCount;
 			throughput = Double.parseDouble(connection.getAttribute(threadPoolRuntimeMbean, "Throughput").toString());
-			output.append("ThreadPoolSize=" + threadTotalCount + " ");
-			output.append("ThreadActiveCount=" + threadActiveCount + ";;;0;" + threadTotalCount + " ");
-			output.append("Throughput=" + df.format(throughput) + " ");
+            output.append("ThreadPoolSize=").append(threadTotalCount).append(" ");
+            output.append("ThreadActiveCount=").append(threadActiveCount).append(";;;0;").append(threadTotalCount).append(" ");
+            output.append("Throughput=").append(df.format(throughput)).append(" ");
 			code = checkResult(threadActiveCount, threadTotalCount, critical, warning, code);
+            if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode()) {
+                result.setMessage("Active threads = " + threadActiveCount + " / " + threadTotalCount);
+            }
 		} catch (Exception e) {
+            e.printStackTrace();
 			result.setStatus(Status.UNKNOWN);
-			result.setMessage(Status.UNKNOWN.getMessage(MESSAGE));
+			result.setMessage(e.toString());
 			return result;
 		}
 
 		for (Status status : Status.values()) {
 			if (code == status.getCode()) {
 				result.setStatus(status);
-				result.setMessage(status.getMessage(MESSAGE));
+                if (null == result.getMessage() || result.getMessage().length() == 0) {
+				    result.setMessage(status.getMessage(MESSAGE));
+                }
 				result.setOutput(output.toString());
+                break;
 			}
 		}
 

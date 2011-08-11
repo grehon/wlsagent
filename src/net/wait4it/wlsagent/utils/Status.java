@@ -20,7 +20,7 @@ package net.wait4it.wlsagent.utils;
 
 /**
  * @author Yann Lambret
- *
+ * @author Kiril Dunn
  */
 public enum Status {
 
@@ -29,15 +29,15 @@ public enum Status {
 	CRITICAL ( 2, "Critical alert raised by the" ),
 	UNKNOWN  ( 3, "Unknown status for the" );
 
-	private Integer code;
-	private String message;
+	private final int code;
+	private final String message;
 
-	private Status(Integer code, String message) {
+	private Status(int code, String message) {
 		this.code = code;
 		this.message = message;
 	}
 
-	public Integer getCode() {
+	public int getCode() {
 		return code;
 	}
 

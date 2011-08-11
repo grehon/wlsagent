@@ -25,10 +25,10 @@ import net.wait4it.wlsagent.utils.Result;
 
 /**
  * @author Yann Lambret
- *
+ * @author Kiril Dunn
  */
 public interface Test {
 
-	public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params);
+	Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params);
 
 }

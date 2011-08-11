@@ -26,7 +26,7 @@ import net.wait4it.wlsagent.utils.Status;
 
 /**
  * @author Yann Lambret
- *
+ * @author Kiril Dunn
  */
 public class JtaTest extends TestUtils implements Test {
 
@@ -34,40 +34,47 @@ public class JtaTest extends TestUtils implements Test {
 
 	public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
 		Result result = new Result();
-		StringBuilder output = new StringBuilder();
-		Integer code = 0;
+		StringBuilder output = new StringBuilder(100);
+		int code = 0;
 
 		/**
 		 * Specific test variables
 		 */
-		ObjectName jtaRuntimeMbean = null;
-		Long activeTransactionsTotalCount = null;
-		Long warning = null;
-		Long critical = null;
+		ObjectName jtaRuntimeMbean;
+		long activeTransactionsTotalCount;
+		long warning;
+		long critical;
 
 		/**
 		 * Parse parameters
 		 */
-		String[] paramsArray = params.split(";");
+		String[] paramsArray = SEMICOLON_PATTERN.split(params);
 		warning = Long.parseLong(paramsArray[1]);
 		critical = Long.parseLong(paramsArray[2]);
 
 		try {
 			jtaRuntimeMbean = (ObjectName)connection.getAttribute(serverRuntimeMbean, "JTARuntime");
-			activeTransactionsTotalCount = (Long.parseLong(connection.getAttribute(jtaRuntimeMbean, "ActiveTransactionsTotalCount").toString()));
-			output.append("ActiveTransactions=" + activeTransactionsTotalCount + " ");
+			activeTransactionsTotalCount = Long.parseLong(connection.getAttribute(jtaRuntimeMbean, "ActiveTransactionsTotalCount").toString());
+            output.append("ActiveTransactions=").append(activeTransactionsTotalCount).append(" ");
 			code = checkResult(activeTransactionsTotalCount, critical, warning, code);
+            if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode()) {
+                result.setMessage("Active JTA transactions = " + activeTransactionsTotalCount);
+            }
 		} catch (Exception e) {
+            e.printStackTrace();
 			result.setStatus(Status.UNKNOWN);
-			result.setMessage(Status.UNKNOWN.getMessage(MESSAGE));
+			result.setMessage(e.toString());
 			return result;
 		}
 
 		for (Status status : Status.values()) {
 			if (code == status.getCode()) {
 				result.setStatus(status);
-				result.setMessage(status.getMessage(MESSAGE));
+                if (null == result.getMessage() || result.getMessage().length() == 0) {
+				    result.setMessage(status.getMessage(MESSAGE));
+                }
 				result.setOutput(output.toString());
+                break;
 			}
 		}
 

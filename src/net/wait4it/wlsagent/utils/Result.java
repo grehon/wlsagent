@@ -20,13 +20,12 @@ package net.wait4it.wlsagent.utils;
 
 /**
  * @author Yann Lambret
- *
  */
 public class Result {
 
-	private Status status;
-	private String message;
-	private String output;
+	private Status status = null;
+	private String message = null;
+	private String output = null;
 
 	public Status getStatus() {
 		return status;

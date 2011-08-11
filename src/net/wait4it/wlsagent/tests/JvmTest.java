@@ -26,7 +26,7 @@ import net.wait4it.wlsagent.utils.Status;
 
 /**
  * @author Yann Lambret
- *
+ * @author Kiril Dunn
  */
 public class JvmTest extends TestUtils implements Test {
 
@@ -34,24 +34,24 @@ public class JvmTest extends TestUtils implements Test {
 
 	public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
 		Result result = new Result();
-		StringBuilder output = new StringBuilder();
-		Integer code = 0;
+		StringBuilder output = new StringBuilder(100);
+		int code = 0;
 
 		/**
 		 * Specific test variables
 		 */
-		ObjectName jvmRuntimeMbean = null;
-		Long heapSizeMax = null;
-		Long heapSizeCurrent = null;
-		Long heapFreeCurrent = null;
-		Long heapUsedCurrent = null;
-		Long warning = null;
-		Long critical = null;
+		ObjectName jvmRuntimeMbean;
+		long heapSizeMax;
+		long heapSizeCurrent;
+		long heapFreeCurrent;
+		long heapUsedCurrent;
+		long warning;
+		long critical;
 
 		/**
 		 * Parse parameters
 		 */
-		String[] paramsArray = params.split(";");
+		String[] paramsArray = SEMICOLON_PATTERN.split(params);
 		warning = Long.parseLong(paramsArray[1]);
 		critical = Long.parseLong(paramsArray[2]);
 
@@ -61,20 +61,27 @@ public class JvmTest extends TestUtils implements Test {
 			heapSizeCurrent = format((Long)connection.getAttribute(jvmRuntimeMbean, "HeapSizeCurrent"));
 			heapFreeCurrent = format((Long)connection.getAttribute(jvmRuntimeMbean, "HeapFreeCurrent"));
 			heapUsedCurrent = heapSizeCurrent - heapFreeCurrent;
-			output.append("HeapSize=" + heapSizeCurrent + "M;;;0;" + heapSizeMax + " ");
-			output.append("UsedMemory=" + heapUsedCurrent + "M;;;0;" + heapSizeMax + " ");
+            output.append("HeapSize=").append(heapSizeCurrent).append("M;;;0;").append(heapSizeMax).append(" ");
+            output.append("UsedMemory=").append(heapUsedCurrent).append("M;;;0;").append(heapSizeMax).append(" ");
 			code = checkResult(heapUsedCurrent, heapSizeMax, critical, warning, code);
+            if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode()) {
+                result.setMessage("Memory = " + heapUsedCurrent + " / " + heapSizeCurrent);
+            }
 		} catch (Exception e) {
+            e.printStackTrace();
 			result.setStatus(Status.UNKNOWN);
-			result.setMessage(Status.UNKNOWN.getMessage(MESSAGE));
+			result.setMessage(e.toString());
 			return result;
 		}
 
 		for (Status status : Status.values()) {
 			if (code == status.getCode()) {
 				result.setStatus(status);
-				result.setMessage(status.getMessage(MESSAGE));
+                if (null == result.getMessage() || result.getMessage().length() == 0) {
+				    result.setMessage(status.getMessage(MESSAGE));
+                }
 				result.setOutput(output.toString());
+                break;
 			}
 		}
 

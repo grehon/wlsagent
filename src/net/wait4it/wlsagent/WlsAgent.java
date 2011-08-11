@@ -24,12 +24,14 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 /**
  * @author Yann Lambret
- *
  */
 public class WlsAgent {
 
-	public static void main(String[] args) throws Exception {
-		Integer port = Integer.parseInt(args[0]);
+    private WlsAgent() {
+    }
+
+    public static void main(String[] args) throws Exception {
+		int port = Integer.parseInt(args[0]);
 		Server server = new Server(port);
 
 		ServletContextHandler handler = new ServletContextHandler(ServletContextHandler.SESSIONS);
