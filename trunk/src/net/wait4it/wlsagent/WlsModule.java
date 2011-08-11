@@ -30,29 +30,31 @@ import net.wait4it.wlsagent.utils.Result;
 
 /**
  * @author Yann Lambret
+ * @author Kiril Dunn
  *
  */
 public class WlsModule {
 
-	private StringBuilder header = new StringBuilder();
-	private StringBuilder message = new StringBuilder();
-	private StringBuilder output = new StringBuilder();
-	private ServerNameTest serverNameTest = new ServerNameTest();
+	private final StringBuilder header = new StringBuilder(500);
+	private final StringBuilder message = new StringBuilder(500);
+	private final StringBuilder output = new StringBuilder(500);
+	private final ServerNameTest serverNameTest = new ServerNameTest();
 	private String status = "OK";
-	private Integer code = 0;
+	private int code = 0;
 
 	public String run(Map<String, String> params) {
-		MBeanServerConnection connection = null;
-		ObjectName serverRuntimeMbean = null;
+		MBeanServerConnection connection;
+		ObjectName serverRuntimeMbean;
 
 		try {
 			connection = JmxService.getConnection(params);
 			serverRuntimeMbean = JmxService.getServerRuntime(connection);
 		} catch (Exception e) {
-			return "3|" + e.getMessage();
+            e.printStackTrace();
+			return "3|" + e;
 		}
 
-		header.append(serverNameTest.run(connection, serverRuntimeMbean) + ": ");
+        header.append(serverNameTest.run(connection, serverRuntimeMbean)).append(": ");
 
 		for (Option option : Option.values()) {
 			if (params.containsKey(option.getName())) {
@@ -60,37 +62,54 @@ public class WlsModule {
 			}
 		}
 
-		if (status.equals("OK"))
-			header.append("status " + status);
+		if ("OK".equals(status))
+            header.append("status ").append(status);
 		else
-			header.append("status " + status + " - " + message.toString());
+            header.append("status ").append(status).append(" - ").append(message.toString());
 
-		output.insert(0, header.toString() + "|");
-		output.insert(0, code.toString() + "|");
+		output.insert(0, header + "|");
+		output.insert(0, code + "|");
 		return output.toString();
 	}
 
 	private void checkResult(Result result) {
+        String out = "";
+        String msg = "";
+
 		switch (result.getStatus()) {
 		case OK:
-			output.append(result.getOutput());
+			out = result.getOutput();
 			break;
 		case WARNING:
 			if (code < 1) { code = 1; status = "WARNING"; }
-			message.append(result.getMessage());
-			output.append(result.getOutput());
+			msg = result.getMessage();
+			out = result.getOutput();
 			break;
 		case CRITICAL:
 			if (code < 2) { code = 2; status = "CRITICAL"; }
-			message.append(result.getMessage());
-			output.append(result.getOutput());
+			msg = result.getMessage();
+			out = result.getOutput();
 			break;
 		case UNKNOWN:
 			code = 3;
 			status = "UNKNOWN";
-			message.append(result.getMessage());
+			msg = result.getMessage();
 			break;
 		}
+
+        if (msg.length() > 0) {
+            if (message.length() > 0) {
+                message.append(' ');
+            }
+            message.append(msg);
+        }
+
+        if (out.length() > 0) {
+            if (output.length() > 0) {
+                output.append(' ');
+            }
+            output.append(out);
+        }
 	}
 
 }

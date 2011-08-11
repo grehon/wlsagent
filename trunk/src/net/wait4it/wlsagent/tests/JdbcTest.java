@@ -29,34 +29,34 @@ import net.wait4it.wlsagent.utils.Status;
 
 /**
  * @author Yann Lambret
- *
+ * @author Kiril Dunn
  */
 public class JdbcTest extends TestUtils implements Test {
 
 	private static final String MESSAGE = " jdbc test ";
 
-	public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
+    public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
 		Result result = new Result();
-		StringBuilder output = new StringBuilder();
-		Integer code = 0;
+		StringBuilder output = new StringBuilder(100);
+		int code = 0;
 
 		/**
 		 * Specific test variables
 		 */
-		Map<String,String> datasources = new HashMap<String,String>();
-		ObjectName jdbcServiceRuntimeMbean = null;
-		ObjectName jdbcDataSourceRuntimeMbeans[] = null;
-		String[] thresholdsArray = null;
+		Map<String,String> datasources = new HashMap<String,String>(16);
+		ObjectName jdbcServiceRuntimeMbean;
+		ObjectName[] jdbcDataSourceRuntimeMbeans;
+		String[] thresholdsArray;
 
 		/**
 		 * Populate the HashMap with datasource name keys
 		 * and string values like 'warning;critical'
 		 */
-		String[] paramsArray = params.split("\\|");
-		for (int i = 0; i < paramsArray.length; i++) {
-			String[] datasourcesArray = (paramsArray[i]).split(";", 2);
-			datasources.put(datasourcesArray[0], datasourcesArray[1]);
-		}
+		String[] paramsArray = PIPE_PATTERN.split(params);
+        for (String param : paramsArray) {
+            String[] datasourcesArray = SEMICOLON_PATTERN.split(param, 2);
+            datasources.put(datasourcesArray[0], datasourcesArray[1]);
+        }
 
 		try {
 			jdbcServiceRuntimeMbean = (ObjectName)connection.getAttribute(serverRuntimeMbean, "JDBCServiceRuntime");
@@ -64,34 +64,41 @@ public class JdbcTest extends TestUtils implements Test {
 			for (ObjectName datasourceRuntime : jdbcDataSourceRuntimeMbeans) {
 				String datasourceName = connection.getAttribute(datasourceRuntime, "Name").toString();
 				if (datasources.containsKey("*") || datasources.containsKey(datasourceName)) {
-					Long currCapacity = Long.parseLong(connection.getAttribute(datasourceRuntime, "CurrCapacity").toString());
-					Long activeConnectionsCurrentCount = Long.parseLong(connection.getAttribute(datasourceRuntime, "ActiveConnectionsCurrentCount").toString());
-					Long waitingForConnectionCurrentCount = Long.parseLong(connection.getAttribute(datasourceRuntime, "WaitingForConnectionCurrentCount").toString());
-					output.append("jdbc-" + datasourceName + "-capacity" + "=" + currCapacity + " ");
-					output.append("jdbc-" + datasourceName + "-active" + "=" + activeConnectionsCurrentCount + " ");
-					output.append("jdbc-" + datasourceName + "-waiting" + "=" + waitingForConnectionCurrentCount + " ");
+					long currCapacity = Long.parseLong(connection.getAttribute(datasourceRuntime, "CurrCapacity").toString());
+					long activeConnectionsCurrentCount = Long.parseLong(connection.getAttribute(datasourceRuntime, "ActiveConnectionsCurrentCount").toString());
+					long waitingForConnectionCurrentCount = Long.parseLong(connection.getAttribute(datasourceRuntime, "WaitingForConnectionCurrentCount").toString());
+                    output.append("jdbc-").append(datasourceName).append("-capacity" + "=").append(currCapacity).append(" ");
+                    output.append("jdbc-").append(datasourceName).append("-active" + "=").append(activeConnectionsCurrentCount).append(" ");
+                    output.append("jdbc-").append(datasourceName).append("-waiting" + "=").append(waitingForConnectionCurrentCount).append(" ");
 
 					if (datasources.containsKey("*"))
-						thresholdsArray = datasources.get("*").split(";");
+						thresholdsArray = SEMICOLON_PATTERN.split(datasources.get("*"));
 					else
-						thresholdsArray = datasources.get(datasourceName).split(";");
+						thresholdsArray = SEMICOLON_PATTERN.split(datasources.get(datasourceName));
 
-					Long warning = Long.parseLong(thresholdsArray[0]);
-					Long critical = Long.parseLong(thresholdsArray[1]);
+					long warning = Long.parseLong(thresholdsArray[0]);
+					long critical = Long.parseLong(thresholdsArray[1]);
 					code = checkResult(waitingForConnectionCurrentCount, critical, warning, code);
+                    if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode()) {
+                        result.setMessage("Waiting for JDBC connection (" + datasourceName + ") = " + waitingForConnectionCurrentCount);
+                    }
 				}
 			}
 		} catch (Exception e) {
+            e.printStackTrace();
 			result.setStatus(Status.UNKNOWN);
-			result.setMessage(Status.UNKNOWN.getMessage(MESSAGE));
+			result.setMessage(e.toString());
 			return result;
 		}
 
 		for (Status status : Status.values()) {
 			if (code == status.getCode()) {
 				result.setStatus(status);
-				result.setMessage(status.getMessage(MESSAGE));
+                if (null == result.getMessage() || result.getMessage().length() == 0) {
+				    result.setMessage(status.getMessage(MESSAGE));
+                }
 				result.setOutput(output.toString());
+                break;
 			}
 		}
 

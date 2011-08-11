@@ -32,27 +32,28 @@ import net.wait4it.wlsagent.utils.Status;
 
 /**
  * @author Yann Lambret
- *
+ * @author Kiril Dunn
  */
 public class ComponentTest extends TestUtils implements Test {
 
 	private static final String MESSAGE = " component test ";
 
-	public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
+    public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
 		Result result = new Result();
-		StringBuilder output = new StringBuilder();
-		Integer code = 0;
+		StringBuilder output = new StringBuilder(100);
+		int code = 0;
 
 		/**
 		 * Specific test variables
 		 */
-		Map<String,String> components = new HashMap<String,String>();
-		ObjectName applicationRuntimeMbeans[] = null;
-		String[] thresholdsArray = null;
+		Map<String,String> components = new HashMap<String,String>(16);
+		ObjectName[] applicationRuntimeMbeans;
+		String[] thresholdsArray;
 		// No statistics for WLS internal components
-		List<String> exclusions = new ArrayList<String>();
+		List<String> exclusions = new ArrayList<String>(9);
 		exclusions.add("_async");
 		exclusions.add("bea_wls_deployment_internal");
+        exclusions.add("bea_wls_cluster_internal");
 		exclusions.add("bea_wls_diagnostics");
 		exclusions.add("bea_wls_internal");
 		exclusions.add("console");
@@ -64,21 +65,25 @@ public class ComponentTest extends TestUtils implements Test {
 		 * Populate the HashMap with ContextRoot keys
 		 * and string values like 'warning;critical'
 		 */
-		String[] paramsArray = params.split("\\|");
-		for (int i = 0; i < paramsArray.length; i++) {
-			String[] componentsArray = (paramsArray[i]).split(";", 2);
-			components.put(componentsArray[0], componentsArray[1]);
-		}
+		String[] paramsArray = PIPE_PATTERN.split(params);
+        for (String param : paramsArray) {
+            String[] componentsArray = SEMICOLON_PATTERN.split(param, 2);
+            components.put(componentsArray[0], componentsArray[1]);
+        }
 
 		try {
 			applicationRuntimeMbeans = (ObjectName[])connection.getAttribute(serverRuntimeMbean, "ApplicationRuntimes");
 			for (ObjectName applicationRuntime : applicationRuntimeMbeans) {
-				ObjectName componentRuntimeMbeans[] = (ObjectName[])connection.getAttribute(applicationRuntime, "ComponentRuntimes");
+				ObjectName[] componentRuntimeMbeans = (ObjectName[])connection.getAttribute(applicationRuntime, "ComponentRuntimes");
 				for (ObjectName componentRuntime : componentRuntimeMbeans) {
-					String contextRoot = null;
+					String contextRoot;
 					try {
-						contextRoot = connection.getAttribute(componentRuntime, "ContextRoot").toString().substring(1);
-					} catch (AttributeNotFoundException e) {
+						contextRoot = connection.getAttribute(componentRuntime, "ContextRoot").toString();
+                        // the context root may be an empty string or a single character
+                        if (contextRoot.length() > 1) {
+                            contextRoot = contextRoot.substring(1);
+                        }
+					} catch (AttributeNotFoundException ignored) {
 						/**
 						 * Our component is not an instance of WebAppComponentRuntimeMBean.
 						 */
@@ -87,31 +92,38 @@ public class ComponentTest extends TestUtils implements Test {
 					if (exclusions.contains(contextRoot))
 						continue;
 					if (components.containsKey("*") || components.containsKey(contextRoot)) {
-						Long openSessions = Long.parseLong(connection.getAttribute(componentRuntime, "OpenSessionsCurrentCount").toString());
-						output.append("app-" + contextRoot + "=" + openSessions + " ");
+						long openSessions = Long.parseLong(connection.getAttribute(componentRuntime, "OpenSessionsCurrentCount").toString());
+                        output.append("app-").append(contextRoot).append("=").append(openSessions).append(" ");
 
 						if (components.containsKey("*"))
-							thresholdsArray = components.get("*").split(";");
-						else
-							thresholdsArray = components.get(contextRoot).split(";");
+							thresholdsArray = SEMICOLON_PATTERN.split(components.get("*"));
+                        else
+                            thresholdsArray = SEMICOLON_PATTERN.split(components.get(contextRoot));
 
-						Long warning = Long.parseLong(thresholdsArray[0]);
-						Long critical = Long.parseLong(thresholdsArray[1]);
+						long warning = Long.parseLong(thresholdsArray[0]);
+						long critical = Long.parseLong(thresholdsArray[1]);
 						code = checkResult(openSessions, critical, warning, code);
+                        if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode()) {
+                            result.setMessage("Open Sessions (" + contextRoot + ") = " + openSessions);
+                        }
 					}
 				}
 			}
 		} catch (Exception e) {
+            e.printStackTrace();
 			result.setStatus(Status.UNKNOWN);
-			result.setMessage(Status.UNKNOWN.getMessage(MESSAGE));
+			result.setMessage(e.toString());
 			return result;
 		}
 
-		for (Status status : Status.values()) {
+        for (Status status : Status.values()) {
 			if (code == status.getCode()) {
 				result.setStatus(status);
-				result.setMessage(status.getMessage(MESSAGE));
+                if (null == result.getMessage() || result.getMessage().length() == 0) {
+				    result.setMessage(status.getMessage(MESSAGE));
+                }
 				result.setOutput(output.toString());
+                break;
 			}
 		}
 

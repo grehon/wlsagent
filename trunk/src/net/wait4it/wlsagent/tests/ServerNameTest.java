@@ -23,16 +23,17 @@ import javax.management.ObjectName;
 
 /**
  * @author Yann Lambret
- *
+ * @author Kiril Dunn
  */
 public class ServerNameTest {
 
 	public String run(MBeanServerConnection connection, ObjectName serverRuntimeMbean) {
-		String serverName = null;
+		String serverName;
 		try {
 			serverName = connection.getAttribute(serverRuntimeMbean, "Name").toString();
 		} catch (Exception e) {
-			return null;
+            e.printStackTrace();
+			return e.toString();
 		}
 		return serverName;
 	}
