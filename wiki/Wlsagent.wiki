@@ -271,6 +271,24 @@ See [Invocation] page of this wiki for script samples.
 
 === Screenshots ===
 
-Here is below a sample of the kind of graph you can get with !HeapSize and !UsedMemory properties (generated with PNP4Nagios):
+You can find below a few screenshots of graphs generated with pnp4nagios.
 
-https://lh6.googleusercontent.com/_GD7v8WzxfNA/TbGe2-SFQ_I/AAAAAAAAAmo/raSsL_i6iCY/s400/nagios.jpg
+JVM heap usage:
+
+https://lh4.googleusercontent.com/-9wqsC-9MIoQ/Tmogj2wmblI/AAAAAAAAAv8/4GKgLnhfjWU/s800/jvm.jpg
+
+Throughput:
+
+https://lh5.googleusercontent.com/-XMMTfglwB84/TmogkDkm5lI/AAAAAAAAAwA/wfIhaLeYsjE/s800/throughput.jpg
+
+Thread pool:
+
+https://lh3.googleusercontent.com/-vzpIklz0C3s/TmogjkYWMDI/AAAAAAAAAvw/YEYLJ45SOv4/s800/thread-pool.jpg
+
+Datasource:
+
+https://lh3.googleusercontent.com/-FPwcquV6WBA/Tmogju6eIbI/AAAAAAAAAv4/4dKN0CX_jc4/s800/datasource.jpg
+
+HTTP sessions:
+
+https://lh3.googleusercontent.com/-XWskWGnpmKY/Tmogjw1VhaI/AAAAAAAAAv0/KddLtZbxioQ/s800/sessions.jpg
