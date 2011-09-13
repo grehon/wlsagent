@@ -277,13 +277,13 @@ JVM heap usage:
 
 https://lh4.googleusercontent.com/-9wqsC-9MIoQ/Tmogj2wmblI/AAAAAAAAAv8/4GKgLnhfjWU/s800/jvm.jpg
 
-Throughput:
-
-https://lh5.googleusercontent.com/-XMMTfglwB84/TmogkDkm5lI/AAAAAAAAAwA/wfIhaLeYsjE/s800/throughput.jpg
-
 Thread pool:
 
 https://lh3.googleusercontent.com/-vzpIklz0C3s/TmogjkYWMDI/AAAAAAAAAvw/YEYLJ45SOv4/s800/thread-pool.jpg
+
+Throughput:
+
+https://lh5.googleusercontent.com/-XMMTfglwB84/TmogkDkm5lI/AAAAAAAAAwA/wfIhaLeYsjE/s800/throughput.jpg
 
 Datasource:
 
