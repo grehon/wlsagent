@@ -37,6 +37,21 @@ import net.wait4it.wlsagent.utils.Status;
 public class ComponentTest extends TestUtils implements Test {
 
 	private static final String MESSAGE = " component test ";
+	
+	// No statistics for WLS internal components
+	private static final List<String> EXCLUSIONS = new ArrayList<String>(9);
+
+	static {
+		EXCLUSIONS.add("_async");
+		EXCLUSIONS.add("bea_wls_deployment_internal");
+		EXCLUSIONS.add("bea_wls_cluster_internal");
+		EXCLUSIONS.add("bea_wls_diagnostics");
+		EXCLUSIONS.add("bea_wls_internal");
+		EXCLUSIONS.add("console");
+		EXCLUSIONS.add("consolehelp");
+		EXCLUSIONS.add("uddi");
+		EXCLUSIONS.add("uddiexplorer");
+	}
 
     public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
 		Result result = new Result();
@@ -49,17 +64,6 @@ public class ComponentTest extends TestUtils implements Test {
 		Map<String,String> components = new HashMap<String,String>(16);
 		ObjectName[] applicationRuntimeMbeans;
 		String[] thresholdsArray;
-		// No statistics for WLS internal components
-		List<String> exclusions = new ArrayList<String>(9);
-		exclusions.add("_async");
-		exclusions.add("bea_wls_deployment_internal");
-        exclusions.add("bea_wls_cluster_internal");
-		exclusions.add("bea_wls_diagnostics");
-		exclusions.add("bea_wls_internal");
-		exclusions.add("console");
-		exclusions.add("consolehelp");
-		exclusions.add("uddi");
-		exclusions.add("uddiexplorer");
 
 		/**
 		 * Populate the HashMap with ContextRoot keys
@@ -89,7 +93,7 @@ public class ComponentTest extends TestUtils implements Test {
 						 */
 						continue;
 					}
-					if (exclusions.contains(contextRoot))
+					if (EXCLUSIONS.contains(contextRoot))
 						continue;
 					if (components.containsKey("*") || components.containsKey(contextRoot)) {
 						long openSessions = Long.parseLong(connection.getAttribute(componentRuntime, "OpenSessionsCurrentCount").toString());
