@@ -18,10 +18,7 @@
 
 package net.wait4it.wlsagent.tests;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.management.AttributeNotFoundException;
 import javax.management.MBeanServerConnection;
@@ -39,23 +36,20 @@ public class ComponentTest extends TestUtils implements Test {
 	private static final String MESSAGE = " component test ";
 
 	// No statistics for WLS internal components
-	private static final List<String> EXCLUSIONS = new ArrayList<String>(9);
-
-	static {
-		EXCLUSIONS.add("_async");
-		EXCLUSIONS.add("bea_wls_deployment_internal");
-		EXCLUSIONS.add("bea_wls_cluster_internal");
-		EXCLUSIONS.add("bea_wls_diagnostics");
-		EXCLUSIONS.add("bea_wls_internal");
-		EXCLUSIONS.add("console");
-		EXCLUSIONS.add("consolehelp");
-		EXCLUSIONS.add("uddi");
-		EXCLUSIONS.add("uddiexplorer");
-	}
+	private static final List<String> EXCLUSIONS = Collections.unmodifiableList(Arrays.asList(
+        "_async",
+        "bea_wls_deployment_internal",
+        "bea_wls_cluster_internal",
+        "bea_wls_diagnostics",
+        "bea_wls_internal",
+        "console",
+        "consolehelp",
+        "uddi",
+        "uddiexplorer"));
 
 	public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
 		Result result = new Result();
-		StringBuilder output = new StringBuilder(100);
+		List<String> output = new ArrayList<String>(5);
 		int code = 0;
 
 		/**
@@ -97,7 +91,7 @@ public class ComponentTest extends TestUtils implements Test {
 						continue;
 					if (components.containsKey("*") || components.containsKey(contextRoot)) {
 						long openSessions = Long.parseLong(connection.getAttribute(componentRuntime, "OpenSessionsCurrentCount").toString());
-						output.append("app-").append(contextRoot).append("=").append(openSessions).append(" ");
+						output.add("app-" + contextRoot + "=" + openSessions);
 
 						if (components.containsKey("*"))
 							thresholdsArray = SEMICOLON_PATTERN.split(components.get("*"));
@@ -126,7 +120,16 @@ public class ComponentTest extends TestUtils implements Test {
 				if (null == result.getMessage() || result.getMessage().length() == 0) {
 					result.setMessage(status.getMessage(MESSAGE));
 				}
-				result.setOutput(output.toString());
+
+                Collections.sort(output);
+                StringBuilder out = new StringBuilder(256);
+                for (String o : output) {
+                    if (out.length() > 0) {
+                        out.append(' ');
+                    }
+                    out.append(o);
+                }
+				result.setOutput(out.toString());
 				break;
 			}
 		}

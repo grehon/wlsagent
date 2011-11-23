@@ -18,8 +18,7 @@
 
 package net.wait4it.wlsagent.tests;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
@@ -37,7 +36,7 @@ public class JmsTest extends TestUtils implements Test {
 
     public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
 		Result result = new Result();
-		StringBuilder output = new StringBuilder(100);
+		List<String> output = new ArrayList<String>(5);
 		int code = 0;
 
 		/**
@@ -67,8 +66,12 @@ public class JmsTest extends TestUtils implements Test {
 					if (destinations.containsKey(destinationName)) {
 						long messagesCurrentCount = Long.parseLong(connection.getAttribute(jmsDestinationRuntime, "MessagesCurrentCount").toString());
 						long messagesPendingCount = Long.parseLong(connection.getAttribute(jmsDestinationRuntime, "MessagesPendingCount").toString());
-                        output.append("jms-").append(destinationName).append("-current" + "=").append(messagesCurrentCount).append(" ");
-                        output.append("jms-").append(destinationName).append("-pending" + "=").append(messagesPendingCount).append(" ");
+
+                        StringBuilder out = new StringBuilder(256);
+                        out.append("jms-").append(destinationName).append("-current" + "=").append(messagesCurrentCount).append(' ');
+                        out.append("jms-").append(destinationName).append("-pending" + "=").append(messagesPendingCount);
+                        output.add(out.toString());
+
 						String[] thresholdsArray = SEMICOLON_PATTERN.split(destinations.get(destinationName));
 						long warning = Long.parseLong(thresholdsArray[0]);
 						long critical = Long.parseLong(thresholdsArray[1]);
@@ -92,7 +95,16 @@ public class JmsTest extends TestUtils implements Test {
                 if (null == result.getMessage() || result.getMessage().length() == 0) {
 				    result.setMessage(status.getMessage(MESSAGE));
                 }
-				result.setOutput(output.toString());
+
+                Collections.sort(output);
+                StringBuilder out = new StringBuilder(256);
+                for (String o : output) {
+                    if (out.length() > 0) {
+                        out.append(' ');
+                    }
+                    out.append(o);
+                }
+				result.setOutput(out.toString());
                 break;
 			}
 		}
