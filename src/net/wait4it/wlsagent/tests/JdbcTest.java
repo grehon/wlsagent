@@ -18,8 +18,7 @@
 
 package net.wait4it.wlsagent.tests;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
@@ -37,7 +36,7 @@ public class JdbcTest extends TestUtils implements Test {
 
     public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
 		Result result = new Result();
-		StringBuilder output = new StringBuilder(100);
+		List<String> output = new ArrayList<String>(5);
 		int code = 0;
 
 		/**
@@ -67,9 +66,12 @@ public class JdbcTest extends TestUtils implements Test {
 					long currCapacity = Long.parseLong(connection.getAttribute(datasourceRuntime, "CurrCapacity").toString());
 					long activeConnectionsCurrentCount = Long.parseLong(connection.getAttribute(datasourceRuntime, "ActiveConnectionsCurrentCount").toString());
 					long waitingForConnectionCurrentCount = Long.parseLong(connection.getAttribute(datasourceRuntime, "WaitingForConnectionCurrentCount").toString());
-                    output.append("jdbc-").append(datasourceName).append("-capacity" + "=").append(currCapacity).append(" ");
-                    output.append("jdbc-").append(datasourceName).append("-active" + "=").append(activeConnectionsCurrentCount).append(" ");
-                    output.append("jdbc-").append(datasourceName).append("-waiting" + "=").append(waitingForConnectionCurrentCount).append(" ");
+
+                    StringBuilder out = new StringBuilder(256);
+                    out.append("jdbc-").append(datasourceName).append("-capacity" + "=").append(currCapacity).append(' ');
+                    out.append("jdbc-").append(datasourceName).append("-active" + "=").append(activeConnectionsCurrentCount).append(' ');
+                    out.append("jdbc-").append(datasourceName).append("-waiting" + "=").append(waitingForConnectionCurrentCount);
+                    output.add(out.toString());
 
 					if (datasources.containsKey("*"))
 						thresholdsArray = SEMICOLON_PATTERN.split(datasources.get("*"));
@@ -97,7 +99,16 @@ public class JdbcTest extends TestUtils implements Test {
                 if (null == result.getMessage() || result.getMessage().length() == 0) {
 				    result.setMessage(status.getMessage(MESSAGE));
                 }
-				result.setOutput(output.toString());
+
+                Collections.sort(output);
+                StringBuilder out = new StringBuilder(256);
+                for (String o : output) {
+                    if (out.length() > 0) {
+                        out.append(' ');
+                    }
+                    out.append(o);
+                }
+				result.setOutput(out.toString());
                 break;
 			}
 		}
