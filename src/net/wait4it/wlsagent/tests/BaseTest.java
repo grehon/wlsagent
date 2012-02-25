@@ -21,21 +21,39 @@ package net.wait4it.wlsagent.tests;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
+import net.wait4it.wlsagent.utils.Result;
+import net.wait4it.wlsagent.utils.Status;
+
 /**
  * @author Yann Lambret
  * @author Kiril Dunn
  */
-public class ServerNameTest {
+public class BaseTest {
 
-	public String run(MBeanServerConnection connection, ObjectName serverRuntimeMbean) {
+	public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean) {
 		String serverName;
+		String serverState;
+		Result result = new Result();
+
 		try {
 			serverName = connection.getAttribute(serverRuntimeMbean, "Name").toString();
+			serverState = connection.getAttribute(serverRuntimeMbean, "State").toString();
+
 		} catch (Exception e) {
-            e.printStackTrace();
-			return e.toString();
+			e.printStackTrace();
+			result.setStatus(Status.UNKNOWN);
+			result.setMessage(e.toString());
+			return result;
 		}
-		return serverName;
+		
+		result.setMessage(serverName + " is in " + serverState + " state");
+		
+		if (serverState.equals("RUNNING"))
+			result.setStatus(Status.OK);
+		else
+			result.setStatus(Status.CRITICAL);
+		
+		return result;
 	}
 
 }

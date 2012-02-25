@@ -18,6 +18,7 @@
 
 package net.wait4it.wlsagent.tests;
 
+import javax.management.AttributeNotFoundException;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
@@ -47,6 +48,7 @@ public class JvmTest extends TestUtils implements Test {
 		long heapUsedCurrent;
 		long warning;
 		long critical;
+		double jvmProcessorLoad;
 
 		/**
 		 * Parse parameters
@@ -61,14 +63,24 @@ public class JvmTest extends TestUtils implements Test {
 			heapSizeCurrent = format((Long)connection.getAttribute(jvmRuntimeMbean, "HeapSizeCurrent"));
 			heapFreeCurrent = format((Long)connection.getAttribute(jvmRuntimeMbean, "HeapFreeCurrent"));
 			heapUsedCurrent = heapSizeCurrent - heapFreeCurrent;
-            output.append("HeapSize=").append(heapSizeCurrent).append("M;;;0;").append(heapSizeMax).append(" ");
-            output.append("UsedMemory=").append(heapUsedCurrent).append("M;;;0;").append(heapSizeMax).append(" ");
+			output.append("HeapSize=").append(heapSizeCurrent).append("MB;;;0;").append(heapSizeMax).append(" ");
+			output.append("UsedMemory=").append(heapUsedCurrent).append("MB;;;0;").append(heapSizeMax);
+
+			try {
+				jvmProcessorLoad = (Double)connection.getAttribute(jvmRuntimeMbean, "JvmProcessorLoad");
+				output.append(" JvmProcessorLoad=").append(Math.round(jvmProcessorLoad * 100)).append("%;;;0;100");
+			} catch (AttributeNotFoundException ignored) {
+				/**
+				 * Not dealing with a JRockitRuntimeMBean
+				 */
+			}
+
 			code = checkResult(heapUsedCurrent, heapSizeMax, critical, warning, code);
-            if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode()) {
-                result.setMessage("Memory = " + heapUsedCurrent + " / " + heapSizeCurrent);
-            }
+			if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode()) {
+				result.setMessage("Memory used (" + heapUsedCurrent + "/" + heapSizeCurrent + ")");
+			}
 		} catch (Exception e) {
-            e.printStackTrace();
+			e.printStackTrace();
 			result.setStatus(Status.UNKNOWN);
 			result.setMessage(e.toString());
 			return result;
@@ -77,11 +89,11 @@ public class JvmTest extends TestUtils implements Test {
 		for (Status status : Status.values()) {
 			if (code == status.getCode()) {
 				result.setStatus(status);
-                if (null == result.getMessage() || result.getMessage().length() == 0) {
-				    result.setMessage(status.getMessage(MESSAGE));
-                }
+				if (result.getMessage() == null || result.getMessage().length() == 0) {
+					result.setMessage(status.getMessage(MESSAGE));
+				}
 				result.setOutput(output.toString());
-                break;
+				break;
 			}
 		}
 

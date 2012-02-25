@@ -55,13 +55,13 @@ public class JtaTest extends TestUtils implements Test {
 		try {
 			jtaRuntimeMbean = (ObjectName)connection.getAttribute(serverRuntimeMbean, "JTARuntime");
 			activeTransactionsTotalCount = Long.parseLong(connection.getAttribute(jtaRuntimeMbean, "ActiveTransactionsTotalCount").toString());
-            output.append("ActiveTransactions=").append(activeTransactionsTotalCount).append(" ");
+			output.append("ActiveTransactions=").append(activeTransactionsTotalCount);
 			code = checkResult(activeTransactionsTotalCount, critical, warning, code);
-            if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode()) {
-                result.setMessage("Active JTA transactions = " + activeTransactionsTotalCount);
-            }
+			if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode()) {
+				result.setMessage("Active JTA transactions (" + activeTransactionsTotalCount + ")");
+			}
 		} catch (Exception e) {
-            e.printStackTrace();
+			e.printStackTrace();
 			result.setStatus(Status.UNKNOWN);
 			result.setMessage(e.toString());
 			return result;
@@ -70,11 +70,11 @@ public class JtaTest extends TestUtils implements Test {
 		for (Status status : Status.values()) {
 			if (code == status.getCode()) {
 				result.setStatus(status);
-                if (null == result.getMessage() || result.getMessage().length() == 0) {
-				    result.setMessage(status.getMessage(MESSAGE));
-                }
+				if (result.getMessage() == null || result.getMessage().length() == 0) {
+					result.setMessage(status.getMessage(MESSAGE));
+				}
 				result.setOutput(output.toString());
-                break;
+				break;
 			}
 		}
 

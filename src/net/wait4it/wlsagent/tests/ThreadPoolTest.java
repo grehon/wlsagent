@@ -48,7 +48,7 @@ public class ThreadPoolTest extends TestUtils implements Test {
 		long threadActiveCount;
 		long warning;
 		long critical;
-        double throughput;
+		double throughput;
 		DecimalFormat df = new DecimalFormat("0.00");
 
 		/**
@@ -64,15 +64,15 @@ public class ThreadPoolTest extends TestUtils implements Test {
 			threadIdleCount = Long.parseLong(connection.getAttribute(threadPoolRuntimeMbean, "ExecuteThreadIdleCount").toString());
 			threadActiveCount = threadTotalCount - threadIdleCount;
 			throughput = Double.parseDouble(connection.getAttribute(threadPoolRuntimeMbean, "Throughput").toString());
-            output.append("ThreadPoolSize=").append(threadTotalCount).append(" ");
-            output.append("ThreadActiveCount=").append(threadActiveCount).append(";;;0;").append(threadTotalCount).append(" ");
-            output.append("Throughput=").append(df.format(throughput)).append(" ");
+			output.append("ThreadPoolSize=").append(threadTotalCount).append(" ");
+			output.append("ThreadActiveCount=").append(threadActiveCount).append(";;;0;").append(threadTotalCount).append(" ");
+			output.append("Throughput=").append(df.format(throughput));
 			code = checkResult(threadActiveCount, threadTotalCount, critical, warning, code);
-            if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode()) {
-                result.setMessage("Active threads = " + threadActiveCount + " / " + threadTotalCount);
-            }
+			if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode()) {
+				result.setMessage("Active threads (" + threadActiveCount + "/" + threadTotalCount + ")");
+			}
 		} catch (Exception e) {
-            e.printStackTrace();
+			e.printStackTrace();
 			result.setStatus(Status.UNKNOWN);
 			result.setMessage(e.toString());
 			return result;
@@ -81,11 +81,11 @@ public class ThreadPoolTest extends TestUtils implements Test {
 		for (Status status : Status.values()) {
 			if (code == status.getCode()) {
 				result.setStatus(status);
-                if (null == result.getMessage() || result.getMessage().length() == 0) {
-				    result.setMessage(status.getMessage(MESSAGE));
-                }
+				if (result.getMessage() == null || result.getMessage().length() == 0) {
+					result.setMessage(status.getMessage(MESSAGE));
+				}
 				result.setOutput(output.toString());
-                break;
+				break;
 			}
 		}
 
