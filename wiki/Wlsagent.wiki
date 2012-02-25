@@ -233,7 +233,7 @@ The above command produces the following output:
 
 As you can see, every non authenticated request is denied. Notice the first character of the command output string is the regular Nagios exit code (UNKNOWN in this case).
 
-In order to monitor your application servers, you can create a specific user on the !WebLogic side, and make sure it belongs to the monitor group. This is particularly important if your WebLogic domain is secured with SSL, as an administrative user can't use an non-administrative port.
+In order to monitor your application servers, you can create a specific user on the !WebLogic side, and make sure it belongs to the monitor group. This is particularly important if your !WebLogic domain is secured with SSL, as an administrative user can't use an non-administrative port.
 
 Let's retry by adding the credentials :
 
