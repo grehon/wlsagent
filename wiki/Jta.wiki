@@ -19,3 +19,9 @@ ActiveTransactions=3
 }}}
 
 The output gives the current active transaction count of your application server.
+
+  * Specific messages
+
+{{{
+server1 is in RUNNING state - status WARNING - Active JTA transactions (18)
+}}}
