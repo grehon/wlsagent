@@ -19,3 +19,11 @@ jms-DistributedQueue0-current=2 jms-DistributedQueue0-pending=0 jms-DistributedT
 }}}
 
 The 'current' value is the current number of messages in the destination, and the 'pending' value is the pending number of messages in the destination (non committed or acknowledged messages). The 'current' value is used to raise an alert. So for the !DistributedQueue0 queue, a warning alert will be raised if the current number of messages in the destination is beetween 150 and 200.
+
+  * Specific messages
+
+If the test raises an alert, this kind of message appears at the beginning of the performance data:
+
+{{{
+server1 is in RUNNING state - status WARNING - JMS message count: DistributedQueue0 (168)
+}}}
