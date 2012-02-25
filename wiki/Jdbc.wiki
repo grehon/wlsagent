@@ -35,3 +35,9 @@ jdbc-jdbc/ds1-capacity=1 jdbc-jdbc/ds1-active=0 jdbc-jdbc/ds1-waiting=0 jdbc-jdb
 }}}
 
 The capacity value is the current jdbc pool size at the time the test is performed. The active value is the number of active JDBC connections for the monitored datasource, and the waiting value corresponds to the number of threads waiting for a connection from the pool. This last value is used to raise an alert.
+
+* Specific messages
+
+{{{
+server1 is in RUNNING state - status CRITICAL - Waiting for JDBC connection: jdbc/ds1 (6)
+}}}
