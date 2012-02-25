@@ -69,7 +69,7 @@ The files provided in the 'Downloads' section have been compiled with a 1.6 SDK 
 
 *Maven build*
 
-Kiril Dunn submitted this nice contribution for those who would like to use Maven to build the project. It requires that you add the two WebLogic runtime dependencies (wljmxclient.jar and wlclient.jar) to your local repository (see Maven documentation [http://maven.apache.org/general.html#importing-jars here]). The advantage of this solution is that you will get a unique jar featuring all the required dependencies.
+Kiril Dunn submitted this nice contribution for those who would like to use Maven to build the project. It requires that you add the two !WebLogic runtime dependencies (wljmxclient.jar and wlclient.jar) to your local repository (see Maven documentation [http://maven.apache.org/general.html#importing-jars here]). The advantage of this solution is that you will get a unique jar featuring all the required dependencies.
 
 Just adapt the following pom.xml to suit your needs:
 
