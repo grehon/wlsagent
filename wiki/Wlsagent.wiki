@@ -245,7 +245,7 @@ This time, we get this output:
 
 The Nagios exit code is 0 (OK), because we didn't perform any test on the one hand, and because the 'server1' instance is in the expected state (RUNNING) on the other hand. If your server is in ADMIN state for some reason, you will get this output:
 
-2|AdminServer is in ADMIN state - status CRITICAL|
+2|server1 is in ADMIN state - status CRITICAL|
 
 Next we're going to get information about the JVM heap usage by adding [Jvm jvm]=!UsedMemory;80;90 to the request parameters :
 
