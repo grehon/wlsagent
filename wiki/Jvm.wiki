@@ -20,4 +20,10 @@ These values are compared to the !UsedMemory / !HeapSizeMax ratio, i.e. the curr
 HeapSize=256M;;;0;512 UsedMemory=227M;;;0;512
 }}}
 
-The !HeapSize is the current heap size at the time the test is performed. The !UsedMemory is the amount of memory used at the time the test is performed. Both values are given in MB, the minimal value is always 0, and the max value is the same for both properties (i.e. '!HeapSizeMax' attribute of the JVMRuntimeMBean).
+If you're using a JRockit JVM, the output would be:
+
+{{{
+HeapSize=256M;;;0;512 UsedMemory=227M;;;0;512 JvmProcessorLoad=7%;;;0;100
+}}}
+
+The !HeapSize is the current heap size at the time the test is performed. The !UsedMemory is the amount of memory used at the time the test is performed. Both values are given in MB, the minimal value is always 0, and the max value is the same for both properties (i.e. '!HeapSizeMax' attribute of the JVMRuntimeMBean). The !JvmProcessorLoad is the amount of CPU used by the JVM (JRockit only).
