@@ -17,3 +17,9 @@ ThreadPoolSize=16 ThreadActiveCount=5;;;0;16 Throughput=14.31
 }}}
 
 The !ThreadPoolSize value is the total number of threads in the pool. The !ThreadActiveCount value is the active thread count at the time the test is performed. The minimal value is always 0, and the max value is the !ThreadPoolSize value (i.e. '!ExecuteThreadTotalCount' attribute of the ThreadPoolRuntimeMBean). The Throughput value is the mean number of requests completed per second.
+
+  * Specific messages
+
+{{{
+server1 is in RUNNING state - status WARNING - Active threads (14/16)
+}}}
