@@ -22,6 +22,8 @@ The output gives the current active transaction count of your application server
 
   * Specific messages
 
+If the test raises an alert, this kind of message appears at the beginning of the performance data:
+
 {{{
 server1 is in RUNNING state - status WARNING - Active JTA transactions (18)
 }}}
