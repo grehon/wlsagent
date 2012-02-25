@@ -32,9 +32,8 @@ import javax.servlet.http.HttpServletResponse;
  * @author Yann Lambret
  * @author Kiril Dunn
  */
+@SuppressWarnings("serial")
 public class WlsServlet extends HttpServlet {
-
-	private static final long serialVersionUID = 1L;
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -43,11 +42,11 @@ public class WlsServlet extends HttpServlet {
 
 		response.setContentType("text/plain");
 		response.setStatus(HttpServletResponse.SC_OK);
-        Map<String, String[]> requestParams = request.getParameterMap();
-        Map<String, String> params = new HashMap<String, String>((int) (requestParams.size()/0.75));
-        for (Map.Entry<String, String[]> param : requestParams.entrySet()) {
-            params.put(param.getKey(), param.getValue()[0]);
-        }
+		Map<String, String[]> requestParams = request.getParameterMap();
+		Map<String, String> params = new HashMap<String, String>((int) (requestParams.size()/0.75));
+		for (Map.Entry<String, String[]> param : requestParams.entrySet()) {
+			params.put(param.getKey(), param.getValue()[0]);
+		}
 		response.getWriter().println(module.run(params));
 	}
 

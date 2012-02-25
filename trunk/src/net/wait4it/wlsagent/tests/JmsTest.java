@@ -34,9 +34,10 @@ public class JmsTest extends TestUtils implements Test {
 
 	private static final String MESSAGE = " jms test ";
 
-    public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
+	public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
 		Result result = new Result();
 		List<String> output = new ArrayList<String>(5);
+		List<String> alerts = new ArrayList<String>(5);
 		int code = 0;
 
 		/**
@@ -51,10 +52,10 @@ public class JmsTest extends TestUtils implements Test {
 		 * keys and string values like 'warning;critical'
 		 */
 		String[] paramsArray = PIPE_PATTERN.split(params);
-        for (String param : paramsArray) {
-            String[] destinationsArray = SEMICOLON_PATTERN.split(param, 2);
-            destinations.put(destinationsArray[0], destinationsArray[1]);
-        }
+		for (String param : paramsArray) {
+			String[] destinationsArray = SEMICOLON_PATTERN.split(param, 2);
+			destinations.put(destinationsArray[0], destinationsArray[1]);
+		}
 
 		try {
 			jmsRuntimeMbean = (ObjectName)connection.getAttribute(serverRuntimeMbean, "JMSRuntime");
@@ -67,45 +68,53 @@ public class JmsTest extends TestUtils implements Test {
 						long messagesCurrentCount = Long.parseLong(connection.getAttribute(jmsDestinationRuntime, "MessagesCurrentCount").toString());
 						long messagesPendingCount = Long.parseLong(connection.getAttribute(jmsDestinationRuntime, "MessagesPendingCount").toString());
 
-                        StringBuilder out = new StringBuilder(256);
-                        out.append("jms-").append(destinationName).append("-current" + "=").append(messagesCurrentCount).append(' ');
-                        out.append("jms-").append(destinationName).append("-pending" + "=").append(messagesPendingCount);
-                        output.add(out.toString());
+						StringBuilder out = new StringBuilder(256);
+						out.append("jms-").append(destinationName).append("-current" + "=").append(messagesCurrentCount).append(' ');
+						out.append("jms-").append(destinationName).append("-pending" + "=").append(messagesPendingCount);
+						output.add(out.toString());
 
 						String[] thresholdsArray = SEMICOLON_PATTERN.split(destinations.get(destinationName));
 						long warning = Long.parseLong(thresholdsArray[0]);
 						long critical = Long.parseLong(thresholdsArray[1]);
 						code = checkResult(messagesCurrentCount, critical, warning, code);
-                        if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode()) {
-                            result.setMessage("JMS Message count (" + destinationName + ") = " + messagesCurrentCount);
-                        }
+						if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode()) {
+							alerts.add(destinationName + " (" + messagesCurrentCount + ")");
+						}
 					}
 				}
 			}
 		} catch (Exception e) {
-            e.printStackTrace();
+			e.printStackTrace();
 			result.setStatus(Status.UNKNOWN);
 			result.setMessage(e.toString());
 			return result;
 		}
 
+		if (! alerts.isEmpty()) {
+			Collections.sort(alerts);
+			StringBuilder sb = new StringBuilder(alerts.remove(0));
+			while(! alerts.isEmpty())
+				sb.append(", ").append(alerts.remove(0));
+			result.setMessage("JMS message count: " + sb.toString());
+		}
+
 		for (Status status : Status.values()) {
 			if (code == status.getCode()) {
 				result.setStatus(status);
-                if (null == result.getMessage() || result.getMessage().length() == 0) {
-				    result.setMessage(status.getMessage(MESSAGE));
-                }
+				if (result.getMessage() == null || result.getMessage().length() == 0) {
+					result.setMessage(status.getMessage(MESSAGE));
+				}
 
-                Collections.sort(output);
-                StringBuilder out = new StringBuilder(256);
-                for (String o : output) {
-                    if (out.length() > 0) {
-                        out.append(' ');
-                    }
-                    out.append(o);
-                }
+				Collections.sort(output);
+				StringBuilder out = new StringBuilder(256);
+				for (String o : output) {
+					if (out.length() > 0) {
+						out.append(' ');
+					}
+					out.append(o);
+				}
 				result.setOutput(out.toString());
-                break;
+				break;
 			}
 		}
 

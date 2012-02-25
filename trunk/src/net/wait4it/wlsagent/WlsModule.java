@@ -24,7 +24,7 @@ import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
 import net.wait4it.wlsagent.jmx.JmxService;
-import net.wait4it.wlsagent.tests.ServerNameTest;
+import net.wait4it.wlsagent.tests.BaseTest;
 import net.wait4it.wlsagent.utils.Option;
 import net.wait4it.wlsagent.utils.Result;
 
@@ -38,23 +38,38 @@ public class WlsModule {
 	private final StringBuilder header = new StringBuilder(500);
 	private final StringBuilder message = new StringBuilder(500);
 	private final StringBuilder output = new StringBuilder(500);
-	private final ServerNameTest serverNameTest = new ServerNameTest();
+	private final BaseTest baseTest = new BaseTest();
 	private String status = "OK";
 	private int code = 0;
 
 	public String run(Map<String, String> params) {
 		MBeanServerConnection connection;
 		ObjectName serverRuntimeMbean;
+		Result result;
 
 		try {
 			connection = JmxService.getConnection(params);
 			serverRuntimeMbean = JmxService.getServerRuntime(connection);
 		} catch (Exception e) {
-            e.printStackTrace();
+			e.printStackTrace();
 			return "3|" + e;
 		}
 
-        header.append(serverNameTest.run(connection, serverRuntimeMbean)).append(": ");
+		result = baseTest.run(connection, serverRuntimeMbean);
+		header.append(result.getMessage()).append(" - ");
+
+		switch (result.getStatus()) {
+		case OK:
+			break;
+		case CRITICAL:
+			code = 2;
+			status = "CRITICAL";
+			break;
+		case UNKNOWN:
+			code = 3;
+			status  = "UNKNOWN";
+			break;
+		}
 
 		for (Option option : Option.values()) {
 			if (params.containsKey(option.getName())) {
@@ -62,10 +77,10 @@ public class WlsModule {
 			}
 		}
 
-		if ("OK".equals(status))
-            header.append("status ").append(status);
-		else
-            header.append("status ").append(status).append(" - ").append(message.toString());
+		header.append("status ").append(status);
+
+		if (! status.equals("OK") && message.length() > 0)
+			header.append(" - ").append(message.toString());
 
 		output.insert(0, header + "|");
 		output.insert(0, code + "|");
@@ -73,8 +88,8 @@ public class WlsModule {
 	}
 
 	private void checkResult(Result result) {
-        String out = "";
-        String msg = "";
+		String out = "";
+		String msg = "";
 
 		switch (result.getStatus()) {
 		case OK:
@@ -97,19 +112,19 @@ public class WlsModule {
 			break;
 		}
 
-        if (msg.length() > 0) {
-            if (message.length() > 0) {
-                message.append(' ');
-            }
-            message.append(msg);
-        }
+		if (msg.length() > 0) {
+			if (message.length() > 0) {
+				message.append(" ");
+			}
+			message.append(msg);
+		}
 
-        if (out.length() > 0) {
-            if (output.length() > 0) {
-                output.append(' ');
-            }
-            output.append(out);
-        }
+		if (out.length() > 0) {
+			if (output.length() > 0) {
+				output.append(" ");
+			}
+			output.append(out);
+		}
 	}
 
 }

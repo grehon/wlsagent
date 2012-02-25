@@ -37,19 +37,20 @@ public class ComponentTest extends TestUtils implements Test {
 
 	// No statistics for WLS internal components
 	private static final List<String> EXCLUSIONS = Collections.unmodifiableList(Arrays.asList(
-        "_async",
-        "bea_wls_deployment_internal",
-        "bea_wls_cluster_internal",
-        "bea_wls_diagnostics",
-        "bea_wls_internal",
-        "console",
-        "consolehelp",
-        "uddi",
-        "uddiexplorer"));
+			"_async",
+			"bea_wls_deployment_internal",
+			"bea_wls_cluster_internal",
+			"bea_wls_diagnostics",
+			"bea_wls_internal",
+			"console",
+			"consolehelp",
+			"uddi",
+			"uddiexplorer"));
 
 	public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
 		Result result = new Result();
 		List<String> output = new ArrayList<String>(5);
+		List<String> alerts = new ArrayList<String>(5);
 		int code = 0;
 
 		/**
@@ -102,7 +103,7 @@ public class ComponentTest extends TestUtils implements Test {
 						long critical = Long.parseLong(thresholdsArray[1]);
 						code = checkResult(openSessions, critical, warning, code);
 						if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode()) {
-							result.setMessage("Open Sessions (" + contextRoot + ") = " + openSessions);
+							alerts.add(contextRoot + " (" + openSessions + ")");
 						}
 					}
 				}
@@ -114,21 +115,29 @@ public class ComponentTest extends TestUtils implements Test {
 			return result;
 		}
 
+		if (! alerts.isEmpty()) {
+			Collections.sort(alerts);
+			StringBuilder sb = new StringBuilder(alerts.remove(0));
+			while(! alerts.isEmpty())
+				sb.append(", ").append(alerts.remove(0));
+			result.setMessage("Too many open sessions: " + sb.toString());
+		}
+
 		for (Status status : Status.values()) {
 			if (code == status.getCode()) {
 				result.setStatus(status);
-				if (null == result.getMessage() || result.getMessage().length() == 0) {
+				if (result.getMessage() == null || result.getMessage().length() == 0) {
 					result.setMessage(status.getMessage(MESSAGE));
 				}
 
-                Collections.sort(output);
-                StringBuilder out = new StringBuilder(256);
-                for (String o : output) {
-                    if (out.length() > 0) {
-                        out.append(' ');
-                    }
-                    out.append(o);
-                }
+				Collections.sort(output);
+				StringBuilder out = new StringBuilder(256);
+				for (String o : output) {
+					if (out.length() > 0) {
+						out.append(' ');
+					}
+					out.append(o);
+				}
 				result.setOutput(out.toString());
 				break;
 			}
