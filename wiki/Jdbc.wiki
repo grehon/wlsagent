@@ -38,6 +38,8 @@ The capacity value is the current jdbc pool size at the time the test is perform
 
 * Specific messages
 
+If the test raises an alert, this kind of message appears at the beginning of the performance data:
+
 {{{
 server1 is in RUNNING state - status CRITICAL - Waiting for JDBC connection: jdbc/ds1 (6)
 }}}
