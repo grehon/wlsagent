@@ -23,7 +23,17 @@ Notice the 'warning' and 'critical' thresholds will be the same for all applicat
 With the above example, you will get this kind of output:
 
 {{{
-app1=89 app2=128
+app1=101 app2=158
 }}}
 
 The output gives the current active HTTP session count for each application specified by the user. If you're using a wildcard, !WebLogic internal components won't appear in the application list.
+
+  * Specific messages
+
+If the test raises an alert, this kind of message appears at the beginning of the performance data:
+
+{{{
+server1 is in RUNNING state - status CRITICAL - Too many open sessions: app1(101), app2(158)
+}}}
+
+In this example, both applications appears in the list as they both raised an alert ('warning' alert for app1 and 'critical' alert for app2). Of course, the overall status is the most serious one.
