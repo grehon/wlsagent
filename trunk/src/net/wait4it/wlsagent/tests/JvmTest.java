@@ -75,7 +75,7 @@ public class JvmTest extends TestUtils implements Test {
 
 			code = checkResult(heapUsedCurrent, heapSizeMax, critical, warning, code);
 			if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode()) {
-				result.setMessage("Memory used (" + heapUsedCurrent + "/" + heapSizeCurrent + ")");
+				result.setMessage("Memory used (" + heapUsedCurrent + "/" + heapSizeMax + ")");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
