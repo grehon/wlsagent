@@ -32,8 +32,6 @@ import net.wait4it.wlsagent.utils.Status;
  */
 public class JdbcTest extends TestUtils implements Test {
 
-	private static final String MESSAGE = " jdbc test ";
-
 	public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
 		Result result = new Result();
 		List<String> output = new ArrayList<String>(5);
@@ -105,10 +103,6 @@ public class JdbcTest extends TestUtils implements Test {
 		for (Status status : Status.values()) {
 			if (code == status.getCode()) {
 				result.setStatus(status);
-				if (result.getMessage() == null || result.getMessage().length() == 0) {
-					result.setMessage(status.getMessage(MESSAGE));
-				}
-
 				Collections.sort(output);
 				StringBuilder out = new StringBuilder(256);
 				for (String o : output) {

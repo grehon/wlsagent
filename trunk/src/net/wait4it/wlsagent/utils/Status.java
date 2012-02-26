@@ -24,25 +24,19 @@ package net.wait4it.wlsagent.utils;
  */
 public enum Status {
 
-	OK       ( 0, "" ),
-	WARNING  ( 1, "Warning alert raised by the" ),
-	CRITICAL ( 2, "Critical alert raised by the" ),
-	UNKNOWN  ( 3, "Unknown status for the" );
+	OK       ( 0 ),
+	WARNING  ( 1 ),
+	CRITICAL ( 2 ),
+	UNKNOWN  ( 3 );
 
 	private final int code;
-	private final String message;
 
-	private Status(int code, String message) {
+	private Status(int code) {
 		this.code = code;
-		this.message = message;
 	}
 
 	public int getCode() {
 		return code;
-	}
-
-	public String getMessage(String message) {
-		return this.message + message;
 	}
 
 }

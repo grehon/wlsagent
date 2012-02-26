@@ -31,8 +31,6 @@ import net.wait4it.wlsagent.utils.Status;
  */
 public class JvmTest extends TestUtils implements Test {
 
-	private static final String MESSAGE = " jvm test ";
-
 	public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
 		Result result = new Result();
 		StringBuilder output = new StringBuilder(100);
@@ -89,9 +87,6 @@ public class JvmTest extends TestUtils implements Test {
 		for (Status status : Status.values()) {
 			if (code == status.getCode()) {
 				result.setStatus(status);
-				if (result.getMessage() == null || result.getMessage().length() == 0) {
-					result.setMessage(status.getMessage(MESSAGE));
-				}
 				result.setOutput(output.toString());
 				break;
 			}

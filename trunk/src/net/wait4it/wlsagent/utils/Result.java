@@ -24,8 +24,8 @@ package net.wait4it.wlsagent.utils;
 public class Result {
 
 	private Status status = null;
-	private String message = null;
-	private String output = null;
+	private String message = "";
+	private String output = "";
 
 	public Status getStatus() {
 		return status;
