@@ -33,8 +33,6 @@ import net.wait4it.wlsagent.utils.Status;
  */
 public class ComponentTest extends TestUtils implements Test {
 
-	private static final String MESSAGE = " component test ";
-
 	// No statistics for WLS internal components
 	private static final List<String> EXCLUSIONS = Collections.unmodifiableList(Arrays.asList(
 			"_async",
@@ -126,10 +124,6 @@ public class ComponentTest extends TestUtils implements Test {
 		for (Status status : Status.values()) {
 			if (code == status.getCode()) {
 				result.setStatus(status);
-				if (result.getMessage() == null || result.getMessage().length() == 0) {
-					result.setMessage(status.getMessage(MESSAGE));
-				}
-
 				Collections.sort(output);
 				StringBuilder out = new StringBuilder(256);
 				for (String o : output) {
