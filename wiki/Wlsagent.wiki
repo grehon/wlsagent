@@ -10,7 +10,7 @@ You can get the performance data by submitting simple HTTP requests to the plugi
 
 *Ant build*
 
-The files provided in the 'Downloads' section have been compiled with a 1.6 SDK and Jetty 7.3.0 dependencies. If you want to build the plugin by yourself, just follow these steps:
+The files provided in the 'Downloads' section have been compiled with a 1.6 SDK and Jetty 7.5.4 dependencies. If you want to build the plugin by yourself, just follow these steps:
 
   * Download the last jetty distribution [http://www.eclipse.org/jetty/downloads.php here].
   * Create a lib directory in your working directory.
