@@ -31,17 +31,17 @@ public class WlsAgent {
     }
 
     public static void main(String[] args) throws Exception {
-		int port = Integer.parseInt(args[0]);
-		Server server = new Server(port);
+        int port = Integer.parseInt(args[0]);
+        Server server = new Server(port);
 
-		ServletContextHandler handler = new ServletContextHandler(ServletContextHandler.SESSIONS);
-		handler.setContextPath("/wlsagent");
-		server.setHandler(handler);
+        ServletContextHandler handler = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        handler.setContextPath("/wlsagent");
+        server.setHandler(handler);
 
-		handler.addServlet(new ServletHolder(new WlsServlet()), "/*");
+        handler.addServlet(new ServletHolder(new WlsServlet()), "/*");
 
-		server.start();
-		server.join();
-	}
+        server.start();
+        server.join();
+    }
 
 }

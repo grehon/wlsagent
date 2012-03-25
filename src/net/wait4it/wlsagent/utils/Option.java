@@ -32,26 +32,26 @@ import net.wait4it.wlsagent.tests.ThreadPoolTest;
 public enum Option {
 
     JVM        ( "jvm", new JvmTest() ),
-	THREADPOOL ( "thread-pool", new ThreadPoolTest() ),
-	JTA        ( "jta", new JtaTest() ),
-	JMS        ( "jms", new JmsTest() ),
-	JDBC       ( "jdbc", new JdbcTest() ),
-	COMPONENT  ( "component", new ComponentTest() );
+    THREADPOOL ( "thread-pool", new ThreadPoolTest() ),
+    JTA        ( "jta", new JtaTest() ),
+    JMS        ( "jms", new JmsTest() ),
+    JDBC       ( "jdbc", new JdbcTest() ),
+    COMPONENT  ( "component", new ComponentTest() );
 
-	private final String name;
-	private final Test test;
+    private final String name;
+    private final Test test;
 
-	private Option(String name, Test test) {
-		this.name = name;
-		this.test = test;
-	}
+    private Option(String name, Test test) {
+        this.name = name;
+        this.test = test;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public Test getTest() {
-		return test;
-	}
+    public Test getTest() {
+        return test;
+    }
 
 }

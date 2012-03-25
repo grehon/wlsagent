@@ -28,25 +28,25 @@ import javax.management.*;
  */
 public class JmxService {
 
-	private static final ObjectName service;
+    private static final ObjectName service;
 
     private JmxService() {
     }
 
     static {
-		try {
-			service = new ObjectName("com.bea:Name=RuntimeService,Type=weblogic.management.mbeanservers.runtime.RuntimeServiceMBean");
-		} catch (MalformedObjectNameException e) {
-			throw new RuntimeException(e);
-		}
-	}
+        try {
+            service = new ObjectName("com.bea:Name=RuntimeService,Type=weblogic.management.mbeanservers.runtime.RuntimeServiceMBean");
+        } catch (MalformedObjectNameException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-	public static MBeanServerConnection getConnection(Map<String,String> params) throws Exception {
-		return JmxConnectionFactory.getInstance(params);
-	}
+    public static MBeanServerConnection getConnection(Map<String,String> params) throws Exception {
+        return JmxConnectionFactory.getInstance(params);
+    }
 
-	public static ObjectName getServerRuntime(MBeanServerConnection connection) throws Exception {
-		return (ObjectName)connection.getAttribute(service, "ServerRuntime");
-	}
+    public static ObjectName getServerRuntime(MBeanServerConnection connection) throws Exception {
+        return (ObjectName)connection.getAttribute(service, "ServerRuntime");
+    }
 
 }

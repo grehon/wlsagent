@@ -35,19 +35,19 @@ import javax.servlet.http.HttpServletResponse;
 @SuppressWarnings("serial")
 public class WlsServlet extends HttpServlet {
 
-	@Override
-	@SuppressWarnings("unchecked")
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		WlsModule module = new WlsModule();
+    @Override
+    @SuppressWarnings("unchecked")
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        WlsModule module = new WlsModule();
 
-		response.setContentType("text/plain");
-		response.setStatus(HttpServletResponse.SC_OK);
-		Map<String, String[]> requestParams = request.getParameterMap();
-		Map<String, String> params = new HashMap<String, String>((int) (requestParams.size()/0.75));
-		for (Map.Entry<String, String[]> param : requestParams.entrySet()) {
-			params.put(param.getKey(), param.getValue()[0]);
-		}
-		response.getWriter().println(module.run(params));
-	}
+        response.setContentType("text/plain");
+        response.setStatus(HttpServletResponse.SC_OK);
+        Map<String, String[]> requestParams = request.getParameterMap();
+        Map<String, String> params = new HashMap<String, String>((int) (requestParams.size()/0.75));
+        for (Map.Entry<String, String[]> param : requestParams.entrySet()) {
+            params.put(param.getKey(), param.getValue()[0]);
+        }
+        response.getWriter().println(module.run(params));
+    }
 
 }

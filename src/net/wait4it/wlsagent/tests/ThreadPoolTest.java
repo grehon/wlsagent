@@ -32,59 +32,51 @@ import net.wait4it.wlsagent.utils.Status;
  */
 public class ThreadPoolTest extends TestUtils implements Test {
 
-	public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
-		Result result = new Result();
-		StringBuilder output = new StringBuilder(100);
-		int code = 0;
+    public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
+        Result result = new Result();
+        StringBuilder output = new StringBuilder(100);
+        int code = 0;
 
-		/**
-		 * Specific test variables
-		 */
-		ObjectName threadPoolRuntimeMbean;
-		long threadTotalCount;
-		long threadIdleCount;
-		long threadActiveCount;
-		long warning;
-		long critical;
-		double throughput;
-		DecimalFormat df = new DecimalFormat("0.00");
+        /**
+         * Specific test variables
+         */
+        DecimalFormat df = new DecimalFormat("0.00");
 
-		/**
-		 * Parse parameters
-		 */
-		String[] paramsArray = SEMICOLON_PATTERN.split(params);
-		warning = Long.parseLong(paramsArray[1]);
-		critical = Long.parseLong(paramsArray[2]);
+        /**
+         * Parse parameters
+         */
+        String[] paramsArray = SEMICOLON_PATTERN.split(params);
+        long warning = Long.parseLong(paramsArray[1]);
+        long critical = Long.parseLong(paramsArray[2]);
 
-		try {
-			threadPoolRuntimeMbean = (ObjectName)connection.getAttribute(serverRuntimeMbean, "ThreadPoolRuntime");
-			threadTotalCount = Long.parseLong(connection.getAttribute(threadPoolRuntimeMbean, "ExecuteThreadTotalCount").toString());
-			threadIdleCount = Long.parseLong(connection.getAttribute(threadPoolRuntimeMbean, "ExecuteThreadIdleCount").toString());
-			threadActiveCount = threadTotalCount - threadIdleCount;
-			throughput = Double.parseDouble(connection.getAttribute(threadPoolRuntimeMbean, "Throughput").toString());
-			output.append("ThreadPoolSize=").append(threadTotalCount).append(" ");
-			output.append("ThreadActiveCount=").append(threadActiveCount).append(";;;0;").append(threadTotalCount).append(" ");
-			output.append("Throughput=").append(df.format(throughput));
-			code = checkResult(threadActiveCount, threadTotalCount, critical, warning, code);
-			if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode()) {
-				result.setMessage("Active threads (" + threadActiveCount + "/" + threadTotalCount + ")");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			result.setStatus(Status.UNKNOWN);
-			result.setMessage(e.toString());
-			return result;
-		}
+        try {
+            ObjectName threadPoolRuntimeMbean = (ObjectName)connection.getAttribute(serverRuntimeMbean, "ThreadPoolRuntime");
+            long threadTotalCount = Long.parseLong(connection.getAttribute(threadPoolRuntimeMbean, "ExecuteThreadTotalCount").toString());
+            long threadIdleCount = Long.parseLong(connection.getAttribute(threadPoolRuntimeMbean, "ExecuteThreadIdleCount").toString());
+            long threadActiveCount = threadTotalCount - threadIdleCount;
+            double throughput = Double.parseDouble(connection.getAttribute(threadPoolRuntimeMbean, "Throughput").toString());
+            output.append("ThreadPoolSize=").append(threadTotalCount).append(" ");
+            output.append("ThreadActiveCount=").append(threadActiveCount).append(";;;0;").append(threadTotalCount).append(" ");
+            output.append("Throughput=").append(df.format(throughput));
+            code = checkResult(threadActiveCount, threadTotalCount, critical, warning);
+            if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode())
+                result.setMessage("thread pool active count (" + threadActiveCount + "/" + threadTotalCount + ")");
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setStatus(Status.UNKNOWN);
+            result.setMessage(e.toString());
+            return result;
+        }
 
-		for (Status status : Status.values()) {
-			if (code == status.getCode()) {
-				result.setStatus(status);
-				result.setOutput(output.toString());
-				break;
-			}
-		}
+        for (Status status : Status.values()) {
+            if (code == status.getCode()) {
+                result.setStatus(status);
+                result.setOutput(output.toString());
+                break;
+            }
+        }
 
-		return result;
-	}
+        return result;
+    }
 
 }

@@ -29,6 +29,6 @@ import net.wait4it.wlsagent.utils.Result;
  */
 public interface Test {
 
-	Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params);
+    Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params);
 
 }

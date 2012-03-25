@@ -29,48 +29,54 @@ public abstract class TestUtils {
     protected static final Pattern PIPE_PATTERN = Pattern.compile("\\|");
     protected static final Pattern SEMICOLON_PATTERN = Pattern.compile(";");
 
-	public static int checkResult(long n1, long n2, long critical, long warning, int code) {
-		if (isCritical(n1, n2, critical)) {
-			code = 2;
-		} else if (isWarning(n1, n2, warning) && code == 0) {
-			code = 1;
-		}
-		return code;
-	}
+    public static int checkResult(long n1, long n2, long critical, long warning) {
+        int code = 0;
 
-	public static int checkResult(long n, long critical, long warning, int code) {
-		if (isCritical(n, critical)) {
-			code = 2;
-		} else if (isWarning(n, warning) && code == 0) {
-			code = 1;
-		}
-		return code;
-	}
+        if (isCritical(n1, n2, critical)) {
+            code = 2;
+        } else if (isWarning(n1, n2, warning)) {
+            code = 1;
+        }
 
-	public static long format(Long value) {
-		return value / 1024 / 1024;
-	}
+        return code;
+    }
 
-	private static boolean isCritical(long n1, long n2, long critical) {
-		long ratio = ratio(n1, n2);
-		return ratio >= critical;
-	}
+    public static int checkResult(long n, long critical, long warning) {
+        int code = 0;
 
-	private static boolean isCritical(long n, long critical) {
-		return n >= critical;
-	}
+        if (isCritical(n, critical)) {
+            code = 2;
+        } else if (isWarning(n, warning)) {
+            code = 1;
+        }
 
-	private static boolean isWarning(long n1, long n2, long warning) {
-		long ratio = ratio(n1, n2);
-		return ratio >= warning;
-	}
+        return code;
+    }
 
-	private static boolean isWarning(long n, long warning) {
-		return n >= warning;
-	}
+    public static long format(Long value) {
+        return value / 1024 / 1024;
+    }
 
-	private static long ratio(long n1, long n2) {
-		return Math.round((double) n1 / (double) n2 * 100.0);
-	}
+    private static boolean isCritical(long n1, long n2, long critical) {
+        long ratio = ratio(n1, n2);
+        return ratio >= critical;
+    }
+
+    private static boolean isCritical(long n, long critical) {
+        return n >= critical;
+    }
+
+    private static boolean isWarning(long n1, long n2, long warning) {
+        long ratio = ratio(n1, n2);
+        return ratio >= warning;
+    }
+
+    private static boolean isWarning(long n, long warning) {
+        return n >= warning;
+    }
+
+    private static long ratio(long n1, long n2) {
+        return Math.round((double) n1 / (double) n2 * 100.0);
+    }
 
 }

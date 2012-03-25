@@ -31,68 +31,53 @@ import net.wait4it.wlsagent.utils.Status;
  */
 public class JvmTest extends TestUtils implements Test {
 
-	public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
-		Result result = new Result();
-		StringBuilder output = new StringBuilder(100);
-		int code = 0;
+    public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
+        Result result = new Result();
+        StringBuilder output = new StringBuilder(100);
+        int code = 0;
 
-		/**
-		 * Specific test variables
-		 */
-		ObjectName jvmRuntimeMbean;
-		long heapSizeMax;
-		long heapSizeCurrent;
-		long heapFreeCurrent;
-		long heapUsedCurrent;
-		long warning;
-		long critical;
-		double jvmProcessorLoad;
+        /**
+         * Parse parameters
+         */
+        String[] paramsArray = SEMICOLON_PATTERN.split(params);
+        long warning = Long.parseLong(paramsArray[1]);
+        long critical = Long.parseLong(paramsArray[2]);
 
-		/**
-		 * Parse parameters
-		 */
-		String[] paramsArray = SEMICOLON_PATTERN.split(params);
-		warning = Long.parseLong(paramsArray[1]);
-		critical = Long.parseLong(paramsArray[2]);
+        try {
+            ObjectName jvmRuntimeMbean = (ObjectName)connection.getAttribute(serverRuntimeMbean, "JVMRuntime");
+            long heapSizeMax = format((Long)connection.getAttribute(jvmRuntimeMbean, "HeapSizeMax"));
+            long heapSizeCurrent = format((Long)connection.getAttribute(jvmRuntimeMbean, "HeapSizeCurrent"));
+            long heapFreeCurrent = format((Long)connection.getAttribute(jvmRuntimeMbean, "HeapFreeCurrent"));
+            long heapUsedCurrent = heapSizeCurrent - heapFreeCurrent;
+            output.append("HeapSize=").append(heapSizeCurrent).append("MB;;;0;").append(heapSizeMax).append(" ");
+            output.append("UsedMemory=").append(heapUsedCurrent).append("MB;;;0;").append(heapSizeMax);
+            try {
+                double jvmProcessorLoad = (Double)connection.getAttribute(jvmRuntimeMbean, "JvmProcessorLoad");
+                output.append(" JvmProcessorLoad=").append(Math.round(jvmProcessorLoad * 100)).append("%;;;0;100");
+            } catch (AttributeNotFoundException ignored) {
+                /**
+                 * Not dealing with a JRockitRuntimeMBean
+                 */
+            }
+            code = checkResult(heapUsedCurrent, heapSizeMax, critical, warning);
+            if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode())
+                result.setMessage("memory used (" + heapUsedCurrent + "/" + heapSizeMax + ")");
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setStatus(Status.UNKNOWN);
+            result.setMessage(e.toString());
+            return result;
+        }
 
-		try {
-			jvmRuntimeMbean = (ObjectName)connection.getAttribute(serverRuntimeMbean, "JVMRuntime");
-			heapSizeMax = format((Long)connection.getAttribute(jvmRuntimeMbean, "HeapSizeMax"));
-			heapSizeCurrent = format((Long)connection.getAttribute(jvmRuntimeMbean, "HeapSizeCurrent"));
-			heapFreeCurrent = format((Long)connection.getAttribute(jvmRuntimeMbean, "HeapFreeCurrent"));
-			heapUsedCurrent = heapSizeCurrent - heapFreeCurrent;
-			output.append("HeapSize=").append(heapSizeCurrent).append("MB;;;0;").append(heapSizeMax).append(" ");
-			output.append("UsedMemory=").append(heapUsedCurrent).append("MB;;;0;").append(heapSizeMax);
+        for (Status status : Status.values()) {
+            if (code == status.getCode()) {
+                result.setStatus(status);
+                result.setOutput(output.toString());
+                break;
+            }
+        }
 
-			try {
-				jvmProcessorLoad = (Double)connection.getAttribute(jvmRuntimeMbean, "JvmProcessorLoad");
-				output.append(" JvmProcessorLoad=").append(Math.round(jvmProcessorLoad * 100)).append("%;;;0;100");
-			} catch (AttributeNotFoundException ignored) {
-				/**
-				 * Not dealing with a JRockitRuntimeMBean
-				 */
-			}
-
-			code = checkResult(heapUsedCurrent, heapSizeMax, critical, warning, code);
-			if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode()) {
-				result.setMessage("Memory used (" + heapUsedCurrent + "/" + heapSizeMax + ")");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			result.setStatus(Status.UNKNOWN);
-			result.setMessage(e.toString());
-			return result;
-		}
-
-		for (Status status : Status.values()) {
-			if (code == status.getCode()) {
-				result.setStatus(status);
-				result.setOutput(output.toString());
-				break;
-			}
-		}
-
-		return result;
-	}
+        return result;
+    }
 
 }

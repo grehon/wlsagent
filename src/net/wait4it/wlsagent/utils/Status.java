@@ -24,19 +24,19 @@ package net.wait4it.wlsagent.utils;
  */
 public enum Status {
 
-	OK       ( 0 ),
-	WARNING  ( 1 ),
-	CRITICAL ( 2 ),
-	UNKNOWN  ( 3 );
+    OK       ( 0 ),
+    WARNING  ( 1 ),
+    CRITICAL ( 2 ),
+    UNKNOWN  ( 3 );
 
-	private final int code;
+    private final int code;
 
-	private Status(int code) {
-		this.code = code;
-	}
+    private Status(int code) {
+        this.code = code;
+    }
 
-	public int getCode() {
-		return code;
-	}
+    public int getCode() {
+        return code;
+    }
 
 }

@@ -32,91 +32,89 @@ import net.wait4it.wlsagent.utils.Status;
  */
 public class JdbcTest extends TestUtils implements Test {
 
-	public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
-		Result result = new Result();
-		List<String> output = new ArrayList<String>(5);
-		List<String> alerts = new ArrayList<String>(5);
-		int code = 0;
+    public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
+        Result result = new Result();
+        List<String> output = new ArrayList<String>(5);
+        List<String> alerts = new ArrayList<String>(5);
+        int code = 0;
 
-		/**
-		 * Specific test variables
-		 */
-		Map<String,String> datasources = new HashMap<String,String>(16);
-		ObjectName jdbcServiceRuntimeMbean;
-		ObjectName[] jdbcDataSourceRuntimeMbeans;
-		String[] thresholdsArray;
+        /**
+         * Specific test variables
+         */
+        Map<String,String> datasources = new HashMap<String,String>(16);
+        String[] thresholdsArray;
 
-		/**
-		 * Populate the HashMap with datasource name keys
-		 * and string values like 'warning;critical'
-		 */
-		String[] paramsArray = PIPE_PATTERN.split(params);
-		for (String param : paramsArray) {
-			String[] datasourcesArray = SEMICOLON_PATTERN.split(param, 2);
-			datasources.put(datasourcesArray[0], datasourcesArray[1]);
-		}
+        /**
+         * Populate the HashMap with datasource name keys
+         * and string values like 'warning;critical'
+         */
+        String[] paramsArray = PIPE_PATTERN.split(params);
+        for (String param : paramsArray) {
+            String[] datasourcesArray = SEMICOLON_PATTERN.split(param, 2);
+            datasources.put(datasourcesArray[0], datasourcesArray[1]);
+        }
 
-		try {
-			jdbcServiceRuntimeMbean = (ObjectName)connection.getAttribute(serverRuntimeMbean, "JDBCServiceRuntime");
-			jdbcDataSourceRuntimeMbeans = (ObjectName[])connection.getAttribute(jdbcServiceRuntimeMbean, "JDBCDataSourceRuntimeMBeans");
-			for (ObjectName datasourceRuntime : jdbcDataSourceRuntimeMbeans) {
-				String datasourceName = connection.getAttribute(datasourceRuntime, "Name").toString();
-				if (datasources.containsKey("*") || datasources.containsKey(datasourceName)) {
-					long currCapacity = Long.parseLong(connection.getAttribute(datasourceRuntime, "CurrCapacity").toString());
-					long activeConnectionsCurrentCount = Long.parseLong(connection.getAttribute(datasourceRuntime, "ActiveConnectionsCurrentCount").toString());
-					long waitingForConnectionCurrentCount = Long.parseLong(connection.getAttribute(datasourceRuntime, "WaitingForConnectionCurrentCount").toString());
+        try {
+            ObjectName jdbcServiceRuntimeMbean = (ObjectName)connection.getAttribute(serverRuntimeMbean, "JDBCServiceRuntime");
+            ObjectName[] jdbcDataSourceRuntimeMbeans = (ObjectName[])connection.getAttribute(jdbcServiceRuntimeMbean, "JDBCDataSourceRuntimeMBeans");
+            for (ObjectName datasourceRuntime : jdbcDataSourceRuntimeMbeans) {
+                String datasourceName = connection.getAttribute(datasourceRuntime, "Name").toString();
+                if (datasources.containsKey("*") || datasources.containsKey(datasourceName)) {
+                    long currCapacity = Long.parseLong(connection.getAttribute(datasourceRuntime, "CurrCapacity").toString());
+                    long activeConnectionsCurrentCount = Long.parseLong(connection.getAttribute(datasourceRuntime, "ActiveConnectionsCurrentCount").toString());
+                    long waitingForConnectionCurrentCount = Long.parseLong(connection.getAttribute(datasourceRuntime, "WaitingForConnectionCurrentCount").toString());
 
-					StringBuilder out = new StringBuilder(256);
-					out.append("jdbc-").append(datasourceName).append("-capacity" + "=").append(currCapacity).append(' ');
-					out.append("jdbc-").append(datasourceName).append("-active" + "=").append(activeConnectionsCurrentCount).append(' ');
-					out.append("jdbc-").append(datasourceName).append("-waiting" + "=").append(waitingForConnectionCurrentCount);
-					output.add(out.toString());
+                    StringBuilder out = new StringBuilder(256);
+                    out.append("jdbc-").append(datasourceName).append("-capacity" + "=").append(currCapacity).append(' ');
+                    out.append("jdbc-").append(datasourceName).append("-active" + "=").append(activeConnectionsCurrentCount).append(' ');
+                    out.append("jdbc-").append(datasourceName).append("-waiting" + "=").append(waitingForConnectionCurrentCount);
+                    output.add(out.toString());
 
-					if (datasources.containsKey("*"))
-						thresholdsArray = SEMICOLON_PATTERN.split(datasources.get("*"));
-					else
-						thresholdsArray = SEMICOLON_PATTERN.split(datasources.get(datasourceName));
+                    if (datasources.containsKey("*"))
+                        thresholdsArray = SEMICOLON_PATTERN.split(datasources.get("*"));
+                    else
+                        thresholdsArray = SEMICOLON_PATTERN.split(datasources.get(datasourceName));
 
-					long warning = Long.parseLong(thresholdsArray[0]);
-					long critical = Long.parseLong(thresholdsArray[1]);
-					code = checkResult(waitingForConnectionCurrentCount, critical, warning, code);
-					if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode()) {
-						alerts.add(datasourceName + " (" + waitingForConnectionCurrentCount + ")");
-					}
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			result.setStatus(Status.UNKNOWN);
-			result.setMessage(e.toString());
-			return result;
-		}
+                    long warning = Long.parseLong(thresholdsArray[0]);
+                    long critical = Long.parseLong(thresholdsArray[1]);
+                    int testCode = checkResult(waitingForConnectionCurrentCount, critical, warning);
+                    if (testCode == Status.CRITICAL.getCode() || testCode == Status.WARNING.getCode()) 
+                        alerts.add(datasourceName + " (" + waitingForConnectionCurrentCount + ")");
+                    if (testCode > code)
+                        code = testCode;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setStatus(Status.UNKNOWN);
+            result.setMessage(e.toString());
+            return result;
+        }
 
-		if (! alerts.isEmpty()) {
-			Collections.sort(alerts);
-			StringBuilder sb = new StringBuilder(alerts.remove(0));
-			while(! alerts.isEmpty())
-				sb.append(", ").append(alerts.remove(0));
-			result.setMessage("Waiting for JDBC connection: " + sb.toString());
-		}
+        if (! alerts.isEmpty()) {
+            Collections.sort(alerts);
+            StringBuilder sb = new StringBuilder(alerts.remove(0));
+            while(! alerts.isEmpty())
+                sb.append(", ").append(alerts.remove(0));
+            result.setMessage("JDBC connection waiting count: " + sb.toString());
+        }
 
-		for (Status status : Status.values()) {
-			if (code == status.getCode()) {
-				result.setStatus(status);
-				Collections.sort(output);
-				StringBuilder out = new StringBuilder(256);
-				for (String o : output) {
-					if (out.length() > 0) {
-						out.append(' ');
-					}
-					out.append(o);
-				}
-				result.setOutput(out.toString());
-				break;
-			}
-		}
+        for (Status status : Status.values()) {
+            if (code == status.getCode()) {
+                result.setStatus(status);
+                Collections.sort(output);
+                StringBuilder out = new StringBuilder(256);
+                for (String o : output) {
+                    if (out.length() > 0)
+                        out.append(' ');
+                    out.append(o);
+                }
+                result.setOutput(out.toString());
+                break;
+            }
+        }
 
-		return result;
-	}
+        return result;
+    }
 
 }
