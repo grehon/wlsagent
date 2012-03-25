@@ -30,30 +30,29 @@ import net.wait4it.wlsagent.utils.Status;
  */
 public class BaseTest {
 
-	public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean) {
-		String serverName;
-		String serverState;
-		Result result = new Result();
+    public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean) {
+        String serverName;
+        String serverState;
+        Result result = new Result();
 
-		try {
-			serverName = connection.getAttribute(serverRuntimeMbean, "Name").toString();
-			serverState = connection.getAttribute(serverRuntimeMbean, "State").toString();
+        try {
+            serverName = connection.getAttribute(serverRuntimeMbean, "Name").toString();
+            serverState = connection.getAttribute(serverRuntimeMbean, "State").toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setStatus(Status.UNKNOWN);
+            result.setMessage(e.toString());
+            return result;
+        }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			result.setStatus(Status.UNKNOWN);
-			result.setMessage(e.toString());
-			return result;
-		}
-		
-		result.setMessage(serverName + " is in " + serverState + " state");
-		
-		if (serverState.equals("RUNNING"))
-			result.setStatus(Status.OK);
-		else
-			result.setStatus(Status.CRITICAL);
-		
-		return result;
-	}
+        result.setMessage(serverName + " is in " + serverState + " state");
+
+        if (serverState.equals("RUNNING"))
+            result.setStatus(Status.OK);
+        else
+            result.setStatus(Status.CRITICAL);
+
+        return result;
+    }
 
 }

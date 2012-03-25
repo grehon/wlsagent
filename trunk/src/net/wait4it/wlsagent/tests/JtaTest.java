@@ -30,50 +30,42 @@ import net.wait4it.wlsagent.utils.Status;
  */
 public class JtaTest extends TestUtils implements Test {
 
-	public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
-		Result result = new Result();
-		StringBuilder output = new StringBuilder(100);
-		int code = 0;
+    public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
+        Result result = new Result();
+        StringBuilder output = new StringBuilder(100);
+        int code = 0;
 
-		/**
-		 * Specific test variables
-		 */
-		ObjectName jtaRuntimeMbean;
-		long activeTransactionsTotalCount;
-		long warning;
-		long critical;
+        /**
+         * Parse parameters
+         */
+        String[] paramsArray = SEMICOLON_PATTERN.split(params);
+        long warning = Long.parseLong(paramsArray[1]);
+        long critical = Long.parseLong(paramsArray[2]);
 
-		/**
-		 * Parse parameters
-		 */
-		String[] paramsArray = SEMICOLON_PATTERN.split(params);
-		warning = Long.parseLong(paramsArray[1]);
-		critical = Long.parseLong(paramsArray[2]);
+        try {
+            ObjectName jtaRuntimeMbean = (ObjectName)connection.getAttribute(serverRuntimeMbean, "JTARuntime");
+            long activeTransactionsTotalCount = Long.parseLong(connection.getAttribute(jtaRuntimeMbean, "ActiveTransactionsTotalCount").toString());
+            output.append("ActiveTransactions=").append(activeTransactionsTotalCount);
+            code = checkResult(activeTransactionsTotalCount, critical, warning, code);
+            if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode()) {
+                result.setMessage("transaction active count (" + activeTransactionsTotalCount + ")");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setStatus(Status.UNKNOWN);
+            result.setMessage(e.toString());
+            return result;
+        }
 
-		try {
-			jtaRuntimeMbean = (ObjectName)connection.getAttribute(serverRuntimeMbean, "JTARuntime");
-			activeTransactionsTotalCount = Long.parseLong(connection.getAttribute(jtaRuntimeMbean, "ActiveTransactionsTotalCount").toString());
-			output.append("ActiveTransactions=").append(activeTransactionsTotalCount);
-			code = checkResult(activeTransactionsTotalCount, critical, warning, code);
-			if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode()) {
-				result.setMessage("Active JTA transactions (" + activeTransactionsTotalCount + ")");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			result.setStatus(Status.UNKNOWN);
-			result.setMessage(e.toString());
-			return result;
-		}
+        for (Status status : Status.values()) {
+            if (code == status.getCode()) {
+                result.setStatus(status);
+                result.setOutput(output.toString());
+                break;
+            }
+        }
 
-		for (Status status : Status.values()) {
-			if (code == status.getCode()) {
-				result.setStatus(status);
-				result.setOutput(output.toString());
-				break;
-			}
-		}
-
-		return result;
-	}
+        return result;
+    }
 
 }

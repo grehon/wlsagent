@@ -35,96 +35,93 @@ import net.wait4it.wlsagent.utils.Result;
  */
 public class WlsModule {
 
-	private final StringBuilder header = new StringBuilder(500);
-	private final StringBuilder message = new StringBuilder(500);
-	private final StringBuilder output = new StringBuilder(500);
-	private final BaseTest baseTest = new BaseTest();
-	private String status = "OK";
-	private int code = 0;
+    private final StringBuilder header = new StringBuilder(500);
+    private final StringBuilder message = new StringBuilder(500);
+    private final StringBuilder output = new StringBuilder(500);
+    private final BaseTest baseTest = new BaseTest();
+    private String status = "OK";
+    private int code = 0;
 
-	public String run(Map<String, String> params) {
-		MBeanServerConnection connection;
-		ObjectName serverRuntimeMbean;
-		Result result;
+    public String run(Map<String, String> params) {
+        MBeanServerConnection connection;
+        ObjectName serverRuntimeMbean;
+        Result result;
 
-		try {
-			connection = JmxService.getConnection(params);
-			serverRuntimeMbean = JmxService.getServerRuntime(connection);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return "3|" + e;
-		}
+        try {
+            connection = JmxService.getConnection(params);
+            serverRuntimeMbean = JmxService.getServerRuntime(connection);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "3|" + e;
+        }
 
-		result = baseTest.run(connection, serverRuntimeMbean);
-		header.append(result.getMessage()).append(" - ");
+        result = baseTest.run(connection, serverRuntimeMbean);
+        header.append(result.getMessage()).append(" - ");
 
-		switch (result.getStatus()) {
-		case OK:
-			break;
-		case CRITICAL:
-			code = 2;
-			status = "CRITICAL";
-			break;
-		case UNKNOWN:
-			code = 3;
-			status  = "UNKNOWN";
-			break;
-		}
+        switch (result.getStatus()) {
+        case OK:
+            break;
+        case CRITICAL:
+            code = 2;
+            status = "CRITICAL";
+            break;
+        case UNKNOWN:
+            code = 3;
+            status  = "UNKNOWN";
+            break;
+        }
 
-		for (Option option : Option.values()) {
-			if (params.containsKey(option.getName())) {
-				checkResult(option.getTest().run(connection, serverRuntimeMbean, params.get(option.getName())));
-			}
-		}
+        for (Option option : Option.values()) {
+            if (params.containsKey(option.getName()))
+                checkResult(option.getTest().run(connection, serverRuntimeMbean, params.get(option.getName())));
+        }
 
-		header.append("status ").append(status);
+        header.append("status ").append(status);
 
-		if (! status.equals("OK") && message.length() > 0)
-			header.append(" - ").append(message.toString());
+        if (! status.equals("OK") && message.length() > 0)
+            header.append(" - ").append(message.toString());
 
-		output.insert(0, header + "|");
-		output.insert(0, code + "|");
-		return output.toString();
-	}
+        output.insert(0, header + "|");
+        output.insert(0, code + "|");
+        return output.toString();
+    }
 
-	private void checkResult(Result result) {
-		String out = "";
-		String msg = "";
+    private void checkResult(Result result) {
+        String out = "";
+        String msg = "";
 
-		switch (result.getStatus()) {
-		case OK:
-			out = result.getOutput();
-			break;
-		case WARNING:
-			if (code < 1) { code = 1; status = "WARNING"; }
-			msg = result.getMessage();
-			out = result.getOutput();
-			break;
-		case CRITICAL:
-			if (code < 2) { code = 2; status = "CRITICAL"; }
-			msg = result.getMessage();
-			out = result.getOutput();
-			break;
-		case UNKNOWN:
-			code = 3;
-			status = "UNKNOWN";
-			msg = result.getMessage();
-			break;
-		}
+        switch (result.getStatus()) {
+        case OK:
+            out = result.getOutput();
+            break;
+        case WARNING:
+            if (code < 1) { code = 1; status = "WARNING"; }
+            msg = result.getMessage();
+            out = result.getOutput();
+            break;
+        case CRITICAL:
+            if (code < 2) { code = 2; status = "CRITICAL"; }
+            msg = result.getMessage();
+            out = result.getOutput();
+            break;
+        case UNKNOWN:
+            code = 3;
+            status = "UNKNOWN";
+            msg = result.getMessage();
+            break;
+        }
 
-		if (msg.length() > 0) {
-			if (message.length() > 0) {
-				message.append(" ");
-			}
-			message.append(msg);
-		}
+        if (msg.length() > 0) {
+            if (message.length() > 0)
+                message.append(" ");
+            message.append(msg);
+        }
 
-		if (out.length() > 0) {
-			if (output.length() > 0) {
-				output.append(" ");
-			}
-			output.append(out);
-		}
-	}
+        if (out.length() > 0) {
+            if (output.length() > 0)
+                output.append(" ");
+            output.append(out);
+        }
+    }
 
 }
