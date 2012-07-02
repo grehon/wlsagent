@@ -18,7 +18,12 @@
 
 package net.wait4it.wlsagent.tests;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.management.AttributeNotFoundException;
 import javax.management.MBeanServerConnection;
@@ -125,7 +130,7 @@ public class ComponentTest extends TestUtils implements Test {
                 StringBuilder out = new StringBuilder(256);
                 for (String o : output) {
                     if (out.length() > 0)
-                        out.append(' ');
+                        out.append(" ");
                     out.append(o);
                 }
                 result.setOutput(out.toString());

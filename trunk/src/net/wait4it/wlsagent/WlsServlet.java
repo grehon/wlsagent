@@ -19,6 +19,8 @@
 package net.wait4it.wlsagent;
 
 import java.io.IOException;
+
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,10 +29,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 /**
  * @author Yann Lambret
- * @author Kiril Dunn
+ *
  */
 @SuppressWarnings("serial")
 public class WlsServlet extends HttpServlet {
@@ -38,16 +39,21 @@ public class WlsServlet extends HttpServlet {
     @Override
     @SuppressWarnings("unchecked")
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Map<String,String> params = new HashMap<String,String>();
         WlsModule module = new WlsModule();
+
+        for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
+            String param = e.nextElement();
+            params.put(param, request.getParameter(param));
+        }
 
         response.setContentType("text/plain");
         response.setStatus(HttpServletResponse.SC_OK);
-        Map<String, String[]> requestParams = request.getParameterMap();
-        Map<String, String> params = new HashMap<String, String>((int) (requestParams.size()/0.75));
-        for (Map.Entry<String, String[]> param : requestParams.entrySet()) {
-            params.put(param.getKey(), param.getValue()[0]);
-        }
         response.getWriter().println(module.run(params));
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doGet(request, response);
     }
 
 }

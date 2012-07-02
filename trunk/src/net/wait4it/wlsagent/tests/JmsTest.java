@@ -18,7 +18,11 @@
 
 package net.wait4it.wlsagent.tests;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
@@ -60,14 +64,15 @@ public class JmsTest extends TestUtils implements Test {
             for (ObjectName jmsServerRuntime : jmsServerRuntimeMbeans) {
                 ObjectName[] jmsDestinationRuntimeMbeans = (ObjectName[])connection.getAttribute(jmsServerRuntime, "Destinations");
                 for (ObjectName jmsDestinationRuntime : jmsDestinationRuntimeMbeans) {
+                    if ((AT_PATTERN.split(connection.getAttribute(jmsDestinationRuntime, "Name").toString())).length == 0)
+                        continue;
                     String destinationName = AT_PATTERN.split(connection.getAttribute(jmsDestinationRuntime, "Name").toString())[1];
                     if (destinations.containsKey("*") || destinations.containsKey(destinationName)) {
                         long messagesCurrentCount = Long.parseLong(connection.getAttribute(jmsDestinationRuntime, "MessagesCurrentCount").toString());
                         long messagesPendingCount = Long.parseLong(connection.getAttribute(jmsDestinationRuntime, "MessagesPendingCount").toString());
-
                         StringBuilder out = new StringBuilder(256);
-                        out.append("jms-").append(destinationName).append("-current" + "=").append(messagesCurrentCount).append(' ');
-                        out.append("jms-").append(destinationName).append("-pending" + "=").append(messagesPendingCount);
+                        out.append("jms-").append(destinationName).append("-current=").append(messagesCurrentCount).append(" ");
+                        out.append("jms-").append(destinationName).append("-pending=").append(messagesPendingCount);
                         output.add(out.toString());
                         if (destinations.containsKey("*"))
                             thresholdsArray = SEMICOLON_PATTERN.split(destinations.get("*"));
@@ -75,7 +80,7 @@ public class JmsTest extends TestUtils implements Test {
                             thresholdsArray = SEMICOLON_PATTERN.split(destinations.get(destinationName));
                         long warning = Long.parseLong(thresholdsArray[0]);
                         long critical = Long.parseLong(thresholdsArray[1]);
-                        int testCode = checkResult(messagesCurrentCount, critical, warning, code);
+                        int testCode = checkResult(messagesCurrentCount, critical, warning);
                         if (testCode == Status.CRITICAL.getCode() || testCode == Status.WARNING.getCode())
                             alerts.add(destinationName + " (" + messagesCurrentCount + ")");
                         if (testCode > code)
@@ -105,7 +110,7 @@ public class JmsTest extends TestUtils implements Test {
                 StringBuilder out = new StringBuilder(256);
                 for (String o : output) {
                     if (out.length() > 0)
-                        out.append(' ');
+                        out.append(" ");
                     out.append(o);
                 }
                 result.setOutput(out.toString());
