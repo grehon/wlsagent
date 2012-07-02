@@ -18,7 +18,11 @@
 
 package net.wait4it.wlsagent.tests;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
@@ -63,18 +67,15 @@ public class JdbcTest extends TestUtils implements Test {
                     long currCapacity = Long.parseLong(connection.getAttribute(datasourceRuntime, "CurrCapacity").toString());
                     long activeConnectionsCurrentCount = Long.parseLong(connection.getAttribute(datasourceRuntime, "ActiveConnectionsCurrentCount").toString());
                     long waitingForConnectionCurrentCount = Long.parseLong(connection.getAttribute(datasourceRuntime, "WaitingForConnectionCurrentCount").toString());
-
                     StringBuilder out = new StringBuilder(256);
-                    out.append("jdbc-").append(datasourceName).append("-capacity" + "=").append(currCapacity).append(' ');
-                    out.append("jdbc-").append(datasourceName).append("-active" + "=").append(activeConnectionsCurrentCount).append(' ');
-                    out.append("jdbc-").append(datasourceName).append("-waiting" + "=").append(waitingForConnectionCurrentCount);
+                    out.append("jdbc-").append(datasourceName).append("-capacity=").append(currCapacity).append(" ");
+                    out.append("jdbc-").append(datasourceName).append("-active=").append(activeConnectionsCurrentCount).append(" ");
+                    out.append("jdbc-").append(datasourceName).append("-waiting=").append(waitingForConnectionCurrentCount);
                     output.add(out.toString());
-
                     if (datasources.containsKey("*"))
                         thresholdsArray = SEMICOLON_PATTERN.split(datasources.get("*"));
                     else
                         thresholdsArray = SEMICOLON_PATTERN.split(datasources.get(datasourceName));
-
                     long warning = Long.parseLong(thresholdsArray[0]);
                     long critical = Long.parseLong(thresholdsArray[1]);
                     int testCode = checkResult(waitingForConnectionCurrentCount, critical, warning);
@@ -106,7 +107,7 @@ public class JdbcTest extends TestUtils implements Test {
                 StringBuilder out = new StringBuilder(256);
                 for (String o : output) {
                     if (out.length() > 0)
-                        out.append(' ');
+                        out.append(" ");
                     out.append(o);
                 }
                 result.setOutput(out.toString());

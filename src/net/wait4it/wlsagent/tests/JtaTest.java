@@ -46,7 +46,7 @@ public class JtaTest extends TestUtils implements Test {
             ObjectName jtaRuntimeMbean = (ObjectName)connection.getAttribute(serverRuntimeMbean, "JTARuntime");
             long activeTransactionsTotalCount = Long.parseLong(connection.getAttribute(jtaRuntimeMbean, "ActiveTransactionsTotalCount").toString());
             output.append("ActiveTransactions=").append(activeTransactionsTotalCount);
-            code = checkResult(activeTransactionsTotalCount, critical, warning, code);
+            code = checkResult(activeTransactionsTotalCount, critical, warning);
             if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode()) {
                 result.setMessage("transaction active count (" + activeTransactionsTotalCount + ")");
             }
