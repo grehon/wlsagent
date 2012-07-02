@@ -6,6 +6,59 @@ Wlsagent is a small JMX client, which exposes performance metrics for !WebLogic 
 
 You can get the performance data by submitting simple HTTP requests to the plugin, as it embeds a Jetty container. The plugin runs in the background and handles every monitoring request, which allows a small memory footprint (a 32MB JVM heap is sufficient), no CPU overhead and short response time.
 
+=== Prerequisites ===
+
+In order to use the plugin, you need a suitable 1.6 SDK for your operating system. You also need to create a weblogic user on each domain you want to monitor (the user has to belong to the monitor group).
+
+=== Wlsagent in 5 minutes ===
+
+First things first, go to the 'Downloads' section and retrieve the most recent bundle (.tar.gz archive). In this archive, you will find a 'wasagent' directory with these contents:
+
+{{{
+lib
+run.sh
+wlsagent-r124.jar
+wlsagent.sh
+}}}
+
+The lib directory contains the required Jetty dependencies. From now on, I will be using an 'org.eclipse.jetty.aggregate' artifact so there is only one jar for the jetty container, plus the servlet api jar.
+
+You have to copy the following files from your product installation into the lib directory:
+
+{{{
+${WL_HOME}/server/lib/wlclient.jar
+${WL_HOME}/server/lib/wljmxclient.jar
+}}}
+
+So 'lib' directory contents should look like this:
+
+{{{
+jetty-servlet-7.6.2.v20120308.jar
+servlet-api-2.5.jar
+wlclient.jar
+wljmxclient.jar
+}}}
+
+Let's move on to the 'run.sh' script. In this script, you have to set the correct value for JAVA_HOME variable, and you can also specify the connector on which the plugin will be listening.
+
+End with the wlsagent.sh script, which you should only amend if you have changed the default '9090' connector in the 'run.sh' script.
+
+Then type :
+
+{{{
+./run.sh
+}}}
+
+And send a test request to your server (the port specified here is the connector of the target server):
+
+{{{
+./wlsagent.sh 'hostname=hydre2&port=7001&username=nagios&password=Weblogic10&jvm=UsedMemory;90;95'
+}}}
+
+You should get something like:
+
+server1 is in RUNNING state - status OK|HeapSize=256M;;;0;512 UsedMemory=194M;;;0;512
+
 === Building the plugin ===
 
 *Ant build*
