@@ -52,14 +52,14 @@ public class ComponentTest extends TestUtils implements Test {
 
     public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
         Result result = new Result();
-        List<String> output = new ArrayList<String>(5);
-        List<String> alerts = new ArrayList<String>(5);
+        List<String> output = new ArrayList<String>();
+        List<String> alerts = new ArrayList<String>();
         int code = 0;
 
         /**
          * Specific test variables
          */
-        Map<String,String> components = new HashMap<String,String>(16);
+        Map<String,String> components = new HashMap<String,String>();
         String[] thresholdsArray;
 
         /**
@@ -101,7 +101,7 @@ public class ComponentTest extends TestUtils implements Test {
                         long warning = Long.parseLong(thresholdsArray[0]);
                         long critical = Long.parseLong(thresholdsArray[1]);
                         int testCode = checkResult(openSessions, critical, warning);
-                        if (testCode == Status.CRITICAL.getCode() || testCode == Status.WARNING.getCode())
+                        if (testCode == Status.WARNING.getCode() || testCode == Status.CRITICAL.getCode())
                             alerts.add(contextRoot + " (" + openSessions + ")");
                         if (testCode > code)
                             code = testCode;
@@ -115,6 +115,15 @@ public class ComponentTest extends TestUtils implements Test {
             return result;
         }
 
+        // Set result status
+        for (Status status : Status.values()) {
+            if (code == status.getCode()) {
+                result.setStatus(status);           
+                break;
+            }
+        }
+
+        // Set result message
         if (! alerts.isEmpty()) {
             Collections.sort(alerts);
             StringBuilder sb = new StringBuilder(alerts.remove(0));
@@ -123,19 +132,13 @@ public class ComponentTest extends TestUtils implements Test {
             result.setMessage("HTTP session count: " + sb.toString());
         }
 
-        for (Status status : Status.values()) {
-            if (code == status.getCode()) {
-                result.setStatus(status);
-                Collections.sort(output);
-                StringBuilder out = new StringBuilder(256);
-                for (String o : output) {
-                    if (out.length() > 0)
-                        out.append(" ");
-                    out.append(o);
-                }
-                result.setOutput(out.toString());
-                break;
-            }
+        // Set result output
+        if (! output.isEmpty()) {
+            Collections.sort(output);
+            StringBuilder sb = new StringBuilder(output.remove(0));
+            while(! output.isEmpty())
+                sb.append(" ").append(output.remove(0));
+            result.setOutput(sb.toString());
         }
 
         return result;

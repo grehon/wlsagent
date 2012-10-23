@@ -76,7 +76,7 @@ public abstract class TestUtils {
     }
 
     private static long ratio(long n1, long n2) {
-        return Math.round((double) n1 / (double) n2 * 100.0);
+        return Math.round((double) n1 / (double) n2 * 100);
     }
 
 }

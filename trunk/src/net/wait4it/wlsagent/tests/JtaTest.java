@@ -32,7 +32,7 @@ public class JtaTest extends TestUtils implements Test {
 
     public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
         Result result = new Result();
-        StringBuilder output = new StringBuilder(100);
+        StringBuilder output = new StringBuilder();
         int code = 0;
 
         /**
@@ -47,7 +47,7 @@ public class JtaTest extends TestUtils implements Test {
             long activeTransactionsTotalCount = Long.parseLong(connection.getAttribute(jtaRuntimeMbean, "ActiveTransactionsTotalCount").toString());
             output.append("ActiveTransactions=").append(activeTransactionsTotalCount);
             code = checkResult(activeTransactionsTotalCount, critical, warning);
-            if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode()) {
+            if (code == Status.WARNING.getCode() || code == Status.CRITICAL.getCode()) {
                 result.setMessage("transaction active count (" + activeTransactionsTotalCount + ")");
             }
         } catch (Exception e) {
@@ -57,6 +57,7 @@ public class JtaTest extends TestUtils implements Test {
             return result;
         }
 
+        // Set result status and output
         for (Status status : Status.values()) {
             if (code == status.getCode()) {
                 result.setStatus(status);

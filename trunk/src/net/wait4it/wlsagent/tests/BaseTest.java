@@ -31,9 +31,9 @@ import net.wait4it.wlsagent.utils.Status;
 public class BaseTest {
 
     public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean) {
+        Result result = new Result();
         String serverName;
         String serverState;
-        Result result = new Result();
 
         try {
             serverName = connection.getAttribute(serverRuntimeMbean, "Name").toString();
@@ -45,12 +45,12 @@ public class BaseTest {
             return result;
         }
 
-        result.setMessage(serverName + " is in " + serverState + " state");
-
         if (serverState.equals("RUNNING"))
             result.setStatus(Status.OK);
         else
             result.setStatus(Status.CRITICAL);
+
+        result.setMessage(serverName + " is in " + serverState + " state");
 
         return result;
     }
