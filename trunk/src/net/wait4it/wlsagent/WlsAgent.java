@@ -18,6 +18,9 @@
 
 package net.wait4it.wlsagent;
 
+
+import java.net.InetSocketAddress;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -28,11 +31,14 @@ import org.eclipse.jetty.servlet.ServletHolder;
 public class WlsAgent {
 
     private WlsAgent() {
+
     }
 
     public static void main(String[] args) throws Exception {
-        int port = Integer.parseInt(args[0]);
-        Server server = new Server(port);
+        String host = args[0];
+        int port = Integer.parseInt(args[1]);
+        InetSocketAddress address = new InetSocketAddress(host, port);
+        Server server = new Server(address);
 
         ServletContextHandler handler = new ServletContextHandler(ServletContextHandler.SESSIONS);
         handler.setContextPath("/wlsagent");
