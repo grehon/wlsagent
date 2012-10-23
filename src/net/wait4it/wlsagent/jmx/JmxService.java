@@ -20,7 +20,9 @@ package net.wait4it.wlsagent.jmx;
 
 import java.util.Map;
 
-import javax.management.*;
+import javax.management.MBeanServerConnection;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
 
 /**
  * @author Yann Lambret
@@ -28,17 +30,18 @@ import javax.management.*;
  */
 public class JmxService {
 
-    private static final ObjectName service;
-
-    private JmxService() {
-    }
+    private static final ObjectName SERVICE;
 
     static {
         try {
-            service = new ObjectName("com.bea:Name=RuntimeService,Type=weblogic.management.mbeanservers.runtime.RuntimeServiceMBean");
+            SERVICE = new ObjectName("com.bea:Name=RuntimeService,Type=weblogic.management.mbeanservers.runtime.RuntimeServiceMBean");
         } catch (MalformedObjectNameException e) {
-            throw new RuntimeException(e);
+            throw new AssertionError(e);
         }
+    }
+
+    private JmxService() {
+
     }
 
     public static MBeanServerConnection getConnection(Map<String,String> params) throws Exception {
@@ -46,7 +49,7 @@ public class JmxService {
     }
 
     public static ObjectName getServerRuntime(MBeanServerConnection connection) throws Exception {
-        return (ObjectName)connection.getAttribute(service, "ServerRuntime");
+        return (ObjectName)connection.getAttribute(SERVICE, "ServerRuntime");
     }
 
 }

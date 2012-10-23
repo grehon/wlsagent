@@ -37,10 +37,11 @@ public class JmxConnectionFactory {
     private static final String JNDI_NAME = "/jndi/weblogic.management.mbeanservers.runtime";
 
     private JmxConnectionFactory() {
+
     }
 
     public static MBeanServerConnection getInstance(Map<String,String> params) throws Exception {
-        Map<String, String> map = new HashMap<String,String>(10);
+        Map<String, String> map = new HashMap<String,String>();
         JMXServiceURL url;
         JMXConnector connector;
         MBeanServerConnection connection;

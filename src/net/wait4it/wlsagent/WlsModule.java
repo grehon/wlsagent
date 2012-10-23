@@ -27,6 +27,7 @@ import net.wait4it.wlsagent.jmx.JmxService;
 import net.wait4it.wlsagent.tests.BaseTest;
 import net.wait4it.wlsagent.utils.Option;
 import net.wait4it.wlsagent.utils.Result;
+import net.wait4it.wlsagent.utils.Status;
 
 /**
  * @author Yann Lambret
@@ -35,9 +36,9 @@ import net.wait4it.wlsagent.utils.Result;
  */
 public class WlsModule {
 
-    private final StringBuilder header = new StringBuilder(500);
-    private final StringBuilder message = new StringBuilder(500);
-    private final StringBuilder output = new StringBuilder(500);
+    private final StringBuilder header = new StringBuilder();
+    private final StringBuilder message = new StringBuilder();
+    private final StringBuilder output = new StringBuilder();
     private final BaseTest baseTest = new BaseTest();
     private String status = "OK";
     private int code = 0;
@@ -58,19 +59,14 @@ public class WlsModule {
         result = baseTest.run(connection, serverRuntimeMbean);
         header.append(result.getMessage()).append(" - ");
 
-        switch (result.getStatus()) {
-        case OK:
-            break;
-        case CRITICAL:
+        if (result.getStatus().equals(Status.CRITICAL)) {
             code = 2;
             status = "CRITICAL";
-            break;
-        case UNKNOWN:
+        } else if (result.getStatus().equals(Status.UNKNOWN)) {
             code = 3;
-            status  = "UNKNOWN";
-            break;
+            status = "UNKNOWN";
         }
-
+                
         for (Option option : Option.values()) {
             if (params.containsKey(option.getName()))
                 checkResult(option.getTest().run(connection, serverRuntimeMbean, params.get(option.getName())));

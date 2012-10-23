@@ -34,7 +34,7 @@ public class ThreadPoolTest extends TestUtils implements Test {
 
     public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
         Result result = new Result();
-        StringBuilder output = new StringBuilder(100);
+        StringBuilder output = new StringBuilder();
         int code = 0;
 
         /**
@@ -59,7 +59,7 @@ public class ThreadPoolTest extends TestUtils implements Test {
             output.append("ThreadActiveCount=").append(threadActiveCount).append(";;;0;").append(threadTotalCount).append(" ");
             output.append("Throughput=").append(df.format(throughput));
             code = checkResult(threadActiveCount, threadTotalCount, critical, warning);
-            if (code == Status.CRITICAL.getCode() || code == Status.WARNING.getCode())
+            if (code == Status.WARNING.getCode() || code == Status.CRITICAL.getCode())
                 result.setMessage("thread pool active count (" + threadActiveCount + "/" + threadTotalCount + ")");
         } catch (Exception e) {
             e.printStackTrace();
@@ -68,6 +68,7 @@ public class ThreadPoolTest extends TestUtils implements Test {
             return result;
         }
 
+        // Set result status and output
         for (Status status : Status.values()) {
             if (code == status.getCode()) {
                 result.setStatus(status);
