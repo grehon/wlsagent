@@ -38,7 +38,7 @@ public class JtaTest extends TestUtils implements Test {
         /**
          * Parse parameters
          */
-        String[] paramsArray = SEMICOLON_PATTERN.split(params);
+        String[] paramsArray = params.split(";");
         long warning = Long.parseLong(paramsArray[1]);
         long critical = Long.parseLong(paramsArray[2]);
 
@@ -47,9 +47,8 @@ public class JtaTest extends TestUtils implements Test {
             long activeTransactionsTotalCount = Long.parseLong(connection.getAttribute(jtaRuntimeMbean, "ActiveTransactionsTotalCount").toString());
             output.append("ActiveTransactions=").append(activeTransactionsTotalCount);
             code = checkResult(activeTransactionsTotalCount, critical, warning);
-            if (code == Status.WARNING.getCode() || code == Status.CRITICAL.getCode()) {
+            if (code == Status.WARNING.getCode() || code == Status.CRITICAL.getCode())
                 result.setMessage("transaction active count (" + activeTransactionsTotalCount + ")");
-            }
         } catch (Exception e) {
             e.printStackTrace();
             result.setStatus(Status.UNKNOWN);

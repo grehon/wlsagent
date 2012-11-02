@@ -45,7 +45,7 @@ public class ThreadPoolTest extends TestUtils implements Test {
         /**
          * Parse parameters
          */
-        String[] paramsArray = SEMICOLON_PATTERN.split(params);
+        String[] paramsArray = params.split(";");
         long warning = Long.parseLong(paramsArray[1]);
         long critical = Long.parseLong(paramsArray[2]);
 
