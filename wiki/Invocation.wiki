@@ -5,23 +5,10 @@
 {{{
 #!/bin/bash
 
-CURRENT_PATH=$(dirname "$0")
+PORT="9090"
 
-if [ "$#" -ne 1 ] ; then
-    echo "Usage: wlsagent.sh 'param1=value<;w;c>&param2=value2<;w;c>&...&parmamN=value<;w;c>'"
-fi
-
-if [ -f "$CURRENT_PATH/wlsagent.conf" ]; then
-    . ${CURRENT_PATH}/wlsagent.conf
-fi
-
-wget -q -O - http://${WLSAGENT_HOST}:${WLSAGENT_PORT}/${WLSAGENT_URI}?"$@" | awk -F\| '{ print $2"|"$3  ; exit $1 }'
+wget -q -O - http://localhost:${PORT}/wlsagent/WlsAgent --post-data=$@ 2> /dev/null | awk -F\| '{ print $2"|"$3 ; exit $1 }'
 
 exit $?
+
 }}}
-
-Assuming the file wlsagent.conf contains the following:
-
-export WLSAGENT_HOST="localhost"<br>
-export WLSAGENT_PORT="9090"<br>
-export WLSAGENT_URI="wlsagent/!WlsAgent"<br>
