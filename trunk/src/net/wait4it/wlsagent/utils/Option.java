@@ -20,7 +20,8 @@ package net.wait4it.wlsagent.utils;
 
 import net.wait4it.wlsagent.tests.ComponentTest;
 import net.wait4it.wlsagent.tests.JdbcTest;
-import net.wait4it.wlsagent.tests.JmsTest;
+import net.wait4it.wlsagent.tests.JmsQueueTest;
+import net.wait4it.wlsagent.tests.JmsServiceTest;
 import net.wait4it.wlsagent.tests.JtaTest;
 import net.wait4it.wlsagent.tests.JvmTest;
 import net.wait4it.wlsagent.tests.Test;
@@ -34,8 +35,9 @@ public enum Option {
     JVM        ( "jvm", new JvmTest() ),
     THREADPOOL ( "thread-pool", new ThreadPoolTest() ),
     JTA        ( "jta", new JtaTest() ),
-    JMS        ( "jms", new JmsTest() ),
     JDBC       ( "jdbc", new JdbcTest() ),
+    JMSSERVICE ( "jms-service", new JmsServiceTest() ),
+    JMSQUEUE   ( "jms-queue", new JmsQueueTest() ),
     COMPONENT  ( "component", new ComponentTest() );
 
     private final String name;

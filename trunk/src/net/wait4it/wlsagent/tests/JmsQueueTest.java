@@ -34,27 +34,27 @@ import net.wait4it.wlsagent.utils.Status;
  * @author Yann Lambret
  * @author Kiril Dunn
  */
-public class JmsTest extends TestUtils implements Test {
+public class JmsQueueTest extends TestUtils implements Test {
 
     public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
         Result result = new Result();
-        List<String> output = new ArrayList<String>(5);
-        List<String> alerts = new ArrayList<String>(5);
+        List<String> output = new ArrayList<String>();      
         int code = 0;
 
         /**
          * Specific test variables
          */
-        Map<String,String> destinations = new HashMap<String,String>(16);
+        Map<String,String> destinations = new HashMap<String,String>();
+        List<String> alerts = new ArrayList<String>();
         String[] thresholdsArray;
 
         /**
-         * Populate the HashMap with jms destinations name
+         * Populate the HashMap with JMS destination name
          * keys and string values like 'warning;critical'
          */
-        String[] paramsArray = PIPE_PATTERN.split(params);
+        String[] paramsArray = params.split("\\|");
         for (String param : paramsArray) {
-            String[] destinationsArray = SEMICOLON_PATTERN.split(param, 2);
+            String[] destinationsArray = param.split(";", 2);
             destinations.put(destinationsArray[0], destinationsArray[1]);
         }
 
@@ -64,24 +64,26 @@ public class JmsTest extends TestUtils implements Test {
             for (ObjectName jmsServerRuntime : jmsServerRuntimeMbeans) {
                 ObjectName[] jmsDestinationRuntimeMbeans = (ObjectName[])connection.getAttribute(jmsServerRuntime, "Destinations");
                 for (ObjectName jmsDestinationRuntime : jmsDestinationRuntimeMbeans) {
-                    if ((AT_PATTERN.split(connection.getAttribute(jmsDestinationRuntime, "Name").toString())).length == 0)
-                        continue;
-                    String destinationName = AT_PATTERN.split(connection.getAttribute(jmsDestinationRuntime, "Name").toString())[1];
+                    String destinationName = connection.getAttribute(jmsDestinationRuntime, "Name").toString();
+                    if (destinationName.split("@").length == 2)
+                        destinationName = destinationName.split("@")[1];
+                    if (destinationName.split("!").length == 2)
+                        destinationName = destinationName.split("!")[1];
                     if (destinations.containsKey("*") || destinations.containsKey(destinationName)) {
                         long messagesCurrentCount = Long.parseLong(connection.getAttribute(jmsDestinationRuntime, "MessagesCurrentCount").toString());
                         long messagesPendingCount = Long.parseLong(connection.getAttribute(jmsDestinationRuntime, "MessagesPendingCount").toString());
-                        StringBuilder out = new StringBuilder(256);
-                        out.append("jms-").append(destinationName).append("-current=").append(messagesCurrentCount).append(" ");
-                        out.append("jms-").append(destinationName).append("-pending=").append(messagesPendingCount);
+                        StringBuilder out = new StringBuilder();
+                        out.append("JmsQueue-").append(destinationName).append("-current=").append(messagesCurrentCount).append(" ");
+                        out.append("JmsQueue-").append(destinationName).append("-pending=").append(messagesPendingCount);
                         output.add(out.toString());
                         if (destinations.containsKey("*"))
-                            thresholdsArray = SEMICOLON_PATTERN.split(destinations.get("*"));
+                            thresholdsArray = destinations.get("*").split(";");
                         else
-                            thresholdsArray = SEMICOLON_PATTERN.split(destinations.get(destinationName));
+                            thresholdsArray = destinations.get(destinationName).split(";");
                         long warning = Long.parseLong(thresholdsArray[0]);
                         long critical = Long.parseLong(thresholdsArray[1]);
                         int testCode = checkResult(messagesCurrentCount, critical, warning);
-                        if (testCode == Status.CRITICAL.getCode() || testCode == Status.WARNING.getCode())
+                        if (testCode == Status.WARNING.getCode() || testCode == Status.CRITICAL.getCode())
                             alerts.add(destinationName + " (" + messagesCurrentCount + ")");
                         if (testCode > code)
                             code = testCode;
@@ -95,6 +97,15 @@ public class JmsTest extends TestUtils implements Test {
             return result;
         }
 
+        // Set result status
+        for (Status status : Status.values()) {
+            if (code == status.getCode()) {
+                result.setStatus(status);           
+                break;
+            }
+        }
+
+        // Set result message
         if (! alerts.isEmpty()) {
             Collections.sort(alerts);
             StringBuilder sb = new StringBuilder(alerts.remove(0));
@@ -103,19 +114,13 @@ public class JmsTest extends TestUtils implements Test {
             result.setMessage("JMS message count: " + sb.toString());
         }
 
-        for (Status status : Status.values()) {
-            if (code == status.getCode()) {
-                result.setStatus(status);
-                Collections.sort(output);
-                StringBuilder out = new StringBuilder(256);
-                for (String o : output) {
-                    if (out.length() > 0)
-                        out.append(" ");
-                    out.append(o);
-                }
-                result.setOutput(out.toString());
-                break;
-            }
+        // Set result output
+        if (! output.isEmpty()) {
+            Collections.sort(output);
+            StringBuilder sb = new StringBuilder(output.remove(0));
+            while(! output.isEmpty())
+                sb.append(" ").append(output.remove(0));
+            result.setOutput(sb.toString());
         }
 
         return result;
