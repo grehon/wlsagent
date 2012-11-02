@@ -225,57 +225,46 @@ Just adapt the following pom.xml to suit your needs:
 
 === Running the plugin ===
 
-You can use the sample script below to run the plugin. Make sure JAVA_HOME variable is defined and points to a 1.6 JDK installation path.
+You can use the sample script below to run the plugin:
 
 {{{
 #!/bin/bash
 
 cd $(dirname "$0")
 
-CLASSPATH=wlsagent.jar
+JAVA_HOME="/home/wls/Oracle/Middleware/jdk160_29"
+CLASSPATH=".:wlsagent-r121.jar"
+HOST="0.0.0.0"
+PORT="9090"
 
 for jar in $(find "lib" -name '*.jar'); do
   CLASSPATH=${CLASSPATH}:${jar};
 done
 
-${JAVA_HOME}/bin/java -Xmx32m -cp ${CLASSPATH} net.wait4it.wlsagent.WlsAgent "$@" > /dev/null 2>&1 &
+${JAVA_HOME}/bin/java -Xmx32m -cp ${CLASSPATH} net.wait4it.wlsagent.WlsAgent ${HOST} ${PORT} > /dev/null 2>&1 &
 }}}
 
 The content of the working directory should look like this :
   * the lib directory
-  * the wlsagent.jar file
+  * the wlsagent-r121.jar file
   * the previous shell script (run.sh)
 
 The lib directory contains the jar dependencies for Jetty and the !WebLogic implementation of the 't3' protocol:
 
- jetty-continuation-`<version>`.jar<br>
- jetty-http-`<version>`.jar<br>
- jetty-io-`<version>`.jar<br>
- jetty-security-`<version>`.jar<br>
- jetty-server-`<version>`.jar<br>
- jetty-servlet-`<version>`.jar<br>
- jetty-util-`<version>`.jar<br>
- servlet-api-2.5.jar<br>
- wlclient.jar<br>
- wljmxclient.jar<br>
-
-You can get the last Jetty distribution from the Eclipse site:
-
-http://www.eclipse.org/jetty/downloads.php
-
-The !WebLogic jars are available in the ${WL_HOME}/server/lib directory of the !WebLogic server distribution.
-
-Below is a Unix CLI invocation example of the previous script:
-
 {{{
-./run.sh 9090
+jetty-servlet-7.6.2.v20120308.jar
+servlet-api-2.5.jar
+wlclient.jar
+wljmxclient.jar
 }}}
 
 === Using the plugin ===
   
 Once the plugin is running, you can invoke it for instance with wget. In the example below, the plugin is listening on the port 9090, and the target server on the port 7500.
 
-wget -q -O - http://localhost:9090/wlsagent/WlsAgent?hostname=localhost&port=7500
+{{{
+wget -q -O - 'http://localhost:9090/wlsagent/WlsAgent' --post-data='hostname=localhost&port=7500'
+}}}
 
 
 The above command produces the following output:
@@ -288,7 +277,9 @@ In order to monitor your application servers, you can create a specific user on 
 
 Let's retry by adding the credentials :
 
-wget -q -O - 'http://localhost:9090/wlsagent/WlsAgent?hostname=localhost&port=7500&username=nagios&password=nagios' 
+{{{
+wget -q -O - 'http://localhost:9090/wlsagent/WlsAgent' --post-data='hostname=localhost&port=7500&username=nagios&password=nagios' 
+}}}
 
 This time, we get this output:
 
@@ -300,7 +291,9 @@ The Nagios exit code is 0 (OK), because we didn't perform any test on the one ha
 
 Next we're going to get information about the JVM heap usage by adding [Jvm jvm]=!UsedMemory;80;90 to the request parameters :
 
-wget -q -O - 'http://localhost:9090/wlsagent/WlsAgent?hostname=localhost&port=7500&username=nagios&password=nagios&jvm=UsedMemory;80;90'
+{{{
+wget -q -O - 'http://localhost:9090/wlsagent/WlsAgent' --post-data='hostname=localhost&port=7500&username=nagios&password=nagios&jvm=UsedMemory;80;90'
+}}}
 
 The two numeric values at the end are the warning and critical thresholds for the memory usage, we will go back on this later.
 
@@ -312,36 +305,14 @@ As you can see, we get the current heap size, the maximum heap size and the amou
 
 Let's try to change the warning threshold value to '30':
 
-wget -q -O - 'http://localhost:9090/wlsagent/WlsAgent?hostname=localhost&port=7500&username=nagios&password=nagios&jvm=UsedMemory;30;90'
+{{{
+wget -q -O - 'http://localhost:9090/wlsagent/WlsAgent' --post-data='hostname=localhost&port=7500&username=nagios&password=nagios&jvm=UsedMemory;30;90'
+}}}
 
 We get this:
 
-1|server1 is in RUNNING state - status WARNING - Memory used (200/512)|!HeapSize=256M;;;0;512 !UsedMemory=200M;;;0;512
+1|server1 is in RUNNING state - status WARNING: memory used (200/512)|!HeapSize=256M;;;0;512 !UsedMemory=200M;;;0;512
 
 A warning alert is raised by the test, as the ratio used memory / maximum memory is superior to 30% (our warning threshold).
 
 See [Invocation] page of this wiki for script samples.
-
-=== Screenshots ===
-
-You can find below a few screenshots of graphs generated with pnp4nagios.
-
-JVM heap usage:
-
-https://lh4.googleusercontent.com/-9wqsC-9MIoQ/Tmogj2wmblI/AAAAAAAAAv8/4GKgLnhfjWU/s800/jvm.jpg
-
-Thread pool:
-
-https://lh3.googleusercontent.com/-vzpIklz0C3s/TmogjkYWMDI/AAAAAAAAAvw/YEYLJ45SOv4/s800/thread-pool.jpg
-
-Throughput:
-
-https://lh5.googleusercontent.com/-XMMTfglwB84/TmogkDkm5lI/AAAAAAAAAwA/wfIhaLeYsjE/s800/throughput.jpg
-
-Datasource:
-
-https://lh3.googleusercontent.com/-FPwcquV6WBA/Tmogju6eIbI/AAAAAAAAAv4/4dKN0CX_jc4/s800/datasource.jpg
-
-HTTP sessions:
-
-https://lh3.googleusercontent.com/-XWskWGnpmKY/Tmogjw1VhaI/AAAAAAAAAv0/KddLtZbxioQ/s800/sessions.jpg
