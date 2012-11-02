@@ -52,23 +52,23 @@ public class ComponentTest extends TestUtils implements Test {
 
     public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
         Result result = new Result();
-        List<String> output = new ArrayList<String>();
-        List<String> alerts = new ArrayList<String>();
+        List<String> output = new ArrayList<String>();     
         int code = 0;
 
         /**
          * Specific test variables
          */
         Map<String,String> components = new HashMap<String,String>();
+        List<String> alerts = new ArrayList<String>();
         String[] thresholdsArray;
 
         /**
-         * Populate the HashMap with ContextRoot keys
+         * Populate the HashMap with context root keys
          * and string values like 'warning;critical'
          */
-        String[] paramsArray = PIPE_PATTERN.split(params);
+        String[] paramsArray = params.split("\\|");
         for (String param : paramsArray) {
-            String[] componentsArray = SEMICOLON_PATTERN.split(param, 2);
+            String[] componentsArray = param.split(";", 2);
             components.put(componentsArray[0], componentsArray[1]);
         }
 
@@ -84,9 +84,7 @@ public class ComponentTest extends TestUtils implements Test {
                         if (contextRoot.length() > 1)
                             contextRoot = contextRoot.substring(1);
                     } catch (AttributeNotFoundException ignored) {
-                        /**
-                         * Our component is not an instance of WebAppComponentRuntimeMBean.
-                         */
+                        // Our component is not an instance of WebAppComponentRuntimeMBean
                         continue;
                     }
                     if (EXCLUSIONS.contains(contextRoot))
@@ -95,9 +93,9 @@ public class ComponentTest extends TestUtils implements Test {
                         long openSessions = Long.parseLong(connection.getAttribute(componentRuntime, "OpenSessionsCurrentCount").toString());
                         output.add("app-" + contextRoot + "=" + openSessions);
                         if (components.containsKey("*"))
-                            thresholdsArray = SEMICOLON_PATTERN.split(components.get("*"));
+                            thresholdsArray = components.get("*").split(";");
                         else
-                            thresholdsArray = SEMICOLON_PATTERN.split(components.get(contextRoot));
+                            thresholdsArray = components.get(contextRoot).split(";");
                         long warning = Long.parseLong(thresholdsArray[0]);
                         long critical = Long.parseLong(thresholdsArray[1]);
                         int testCode = checkResult(openSessions, critical, warning);

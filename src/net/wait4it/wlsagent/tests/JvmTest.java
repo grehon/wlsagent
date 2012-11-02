@@ -39,7 +39,7 @@ public class JvmTest extends TestUtils implements Test {
         /**
          * Parse parameters
          */
-        String[] paramsArray = SEMICOLON_PATTERN.split(params);
+        String[] paramsArray = params.split(";");
         long warning = Long.parseLong(paramsArray[1]);
         long critical = Long.parseLong(paramsArray[2]);
 
@@ -55,9 +55,7 @@ public class JvmTest extends TestUtils implements Test {
                 double jvmProcessorLoad = (Double)connection.getAttribute(jvmRuntimeMbean, "JvmProcessorLoad");
                 output.append(" JvmProcessorLoad=").append(Math.round(jvmProcessorLoad * 100)).append("%;;;0;100");
             } catch (AttributeNotFoundException ignored) {
-                /**
-                 * Not dealing with a JRockitRuntimeMBean
-                 */
+                // Not dealing with a JRockitRuntimeMBean
             }
             code = checkResult(heapUsedCurrent, heapSizeMax, critical, warning);
             if (code == Status.WARNING.getCode() || code == Status.CRITICAL.getCode())

@@ -18,16 +18,11 @@
 
 package net.wait4it.wlsagent.tests;
 
-import java.util.regex.Pattern;
-
 /**
  * @author Yann Lambret
  * @author Kiril Dunn
  */
 public abstract class TestUtils {
-    protected static final Pattern AT_PATTERN = Pattern.compile("@");
-    protected static final Pattern PIPE_PATTERN = Pattern.compile("\\|");
-    protected static final Pattern SEMICOLON_PATTERN = Pattern.compile(";");
 
     public static int checkResult(long n1, long n2, long critical, long warning) {
         int code = 0;

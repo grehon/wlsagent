@@ -39,22 +39,22 @@ public class JdbcTest extends TestUtils implements Test {
     public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
         Result result = new Result();
         List<String> output = new ArrayList<String>();
-        List<String> alerts = new ArrayList<String>();
         int code = 0;
 
         /**
          * Specific test variables
          */
         Map<String,String> datasources = new HashMap<String,String>();
+        List<String> alerts = new ArrayList<String>();
         String[] thresholdsArray;
 
         /**
          * Populate the HashMap with datasource name keys
          * and string values like 'warning;critical'
          */
-        String[] paramsArray = PIPE_PATTERN.split(params);
+        String[] paramsArray = params.split("\\|");
         for (String param : paramsArray) {
-            String[] datasourcesArray = SEMICOLON_PATTERN.split(param, 2);
+            String[] datasourcesArray = param.split(";", 2);
             datasources.put(datasourcesArray[0], datasourcesArray[1]);
         }
 
@@ -73,9 +73,9 @@ public class JdbcTest extends TestUtils implements Test {
                     out.append("jdbc-").append(datasourceName).append("-waiting=").append(waitingForConnectionCurrentCount);
                     output.add(out.toString());
                     if (datasources.containsKey("*"))
-                        thresholdsArray = SEMICOLON_PATTERN.split(datasources.get("*"));
+                        thresholdsArray = datasources.get("*").split(";");
                     else
-                        thresholdsArray = SEMICOLON_PATTERN.split(datasources.get(datasourceName));
+                        thresholdsArray = datasources.get(datasourceName).split(";");
                     long warning = Long.parseLong(thresholdsArray[0]);
                     long critical = Long.parseLong(thresholdsArray[1]);
                     int testCode = checkResult(waitingForConnectionCurrentCount, critical, warning);
