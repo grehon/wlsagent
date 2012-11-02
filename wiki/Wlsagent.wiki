@@ -57,7 +57,7 @@ And send a test request to your server (the port specified here is the connector
 
 You should get something like:
 
-server1 is in RUNNING state - status OK|HeapSize=256M;;;0;512 UsedMemory=194M;;;0;512
+server1 is in RUNNING state - status OK|!HeapSize=256M;;;0;512 !UsedMemory=194M;;;0;512
 
 === Building the plugin ===
 
