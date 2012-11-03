@@ -75,7 +75,7 @@ public class WlsModule {
         header.append("status ").append(status);
 
         if (! status.equals("OK") && message.length() > 0)
-            header.append(": ").append(message.toString());
+            header.append(" - ").append(message.toString());
 
         output.insert(0, header + "|");
         output.insert(0, code + "|");
