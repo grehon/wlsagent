@@ -25,5 +25,5 @@ The 'current' value is the current number of messages in the destination, and th
 If the test raises an alert, this kind of message appears at the beginning of the performance data:
 
 {{{
-server1 is in RUNNING state - status WARNING: JMS message count: DistributedQueue0 (168)
+server1 is in RUNNING state, status WARNING - JMS message count: DistributedQueue0 (168)
 }}}
