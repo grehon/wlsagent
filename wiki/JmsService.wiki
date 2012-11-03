@@ -1,0 +1,29 @@
+#summary This page details the jms-service option usage
+
+=== jms-service option ===
+
+  * Invocation
+
+{{{
+jms-service=CurrentConnections;15;30
+}}}
+
+15 is the warning threshold for the current connection count. 30 is the critical threshold for the current connection count.
+
+These values are arbitrary values that are compared to the current JMS connection count of your application server.
+
+  * Output
+
+{{{
+JmsService-current=3
+}}}
+
+The output gives the current number of JMS connections handled by your application server.
+
+  * Specific messages
+
+If the test raises an alert, this kind of message appears at the beginning of the performance data:
+
+{{{
+server1 is in RUNNING state - status WARNING: JMS service connection count (18)
+}}}
