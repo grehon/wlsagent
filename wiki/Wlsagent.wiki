@@ -211,3 +211,13 @@ We get this:
 A warning alert is raised by the test, as the ratio used memory / maximum memory is superior to 30% (our warning threshold).
 
 See [Invocation] page of this wiki for script samples.
+
+Available options are:
+
+ * [Jvm jvm]
+ * [ThreadPool thread-pool]
+ * [Jta jta]
+ * [Jdbc jdbc]
+ * [JmsService jms-service]
+ * [JmsQueue jms-queue]
+ * [Component component]
