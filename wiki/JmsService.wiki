@@ -25,5 +25,5 @@ The output gives the current number of JMS connections handled by your applicati
 If the test raises an alert, this kind of message appears at the beginning of the performance data:
 
 {{{
-server1 is in RUNNING state - status WARNING: JMS service connection count (18)
+server1 is in RUNNING state, status WARNING - JMS service connection count (18)
 }}}
