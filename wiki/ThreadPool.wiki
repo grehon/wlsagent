@@ -23,5 +23,5 @@ The !ThreadPoolSize value is the total number of threads in the pool. The !Threa
 If the test raises an alert, this kind of message appears at the beginning of the performance data:
 
 {{{
-server1 is in RUNNING state - status WARNING - Active threads (14/16)
+server1 is in RUNNING state, status WARNING - thread pool active count (14/16)
 }}}
