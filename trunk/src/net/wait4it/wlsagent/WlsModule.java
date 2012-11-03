@@ -57,7 +57,7 @@ public class WlsModule {
         }
 
         result = baseTest.run(connection, serverRuntimeMbean);
-        header.append(result.getMessage()).append(" - ");
+        header.append(result.getMessage()).append(", ");
 
         if (result.getStatus().equals(Status.CRITICAL)) {
             code = 2;
