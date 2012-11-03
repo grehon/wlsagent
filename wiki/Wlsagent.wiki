@@ -17,7 +17,7 @@ First things first, go to the 'Downloads' section and retrieve the most recent b
 {{{
 lib
 run.sh
-wlsagent-r121.jar
+wlsagent-r134.jar
 wlsagent.sh
 }}}
 
@@ -57,7 +57,7 @@ And send a test request to your server (the port specified here is the connector
 
 You should get something like:
 
-server1 is in RUNNING state - status OK|!HeapSize=256M;;;0;512 !UsedMemory=194M;;;0;512
+server1 is in RUNNING state, status OK|!HeapSize=256M;;;0;512 !UsedMemory=194M;;;0;512
 
 === Building the plugin ===
 
@@ -128,7 +128,7 @@ You can use the sample script below to run the plugin:
 cd $(dirname "$0")
 
 JAVA_HOME="/home/wls/Oracle/Middleware/jdk160_29"
-CLASSPATH=".:wlsagent-r121.jar"
+CLASSPATH=".:wlsagent-r134.jar"
 HOST="0.0.0.0"
 PORT="9090"
 
@@ -141,7 +141,7 @@ ${JAVA_HOME}/bin/java -Xmx32m -cp ${CLASSPATH} net.wait4it.wlsagent.WlsAgent ${H
 
 The content of the working directory should look like this :
   * the lib directory
-  * the wlsagent-r121.jar file
+  * the wlsagent-r134.jar file
   * the previous shell script (run.sh)
 
 The lib directory contains the jar dependencies for Jetty and the !WebLogic implementation of the 't3' protocol:
@@ -178,11 +178,11 @@ wget -q -O - 'http://localhost:9090/wlsagent/WlsAgent' --post-data='hostname=loc
 
 This time, we get this output:
 
-0|server1 is in RUNNING state - status OK|
+0|server1 is in RUNNING state, status OK|
 
 The Nagios exit code is 0 (OK), because we didn't perform any test on the one hand, and because the 'server1' instance is in the expected state (RUNNING) on the other hand. If your server is in ADMIN state for some reason, you will get this output:
 
-2|server1 is in ADMIN state - status CRITICAL|
+2|server1 is in ADMIN state, status CRITICAL|
 
 Next we're going to get information about the JVM heap usage by adding [Jvm jvm]=!UsedMemory;80;90 to the request parameters :
 
@@ -194,7 +194,7 @@ The two numeric values at the end are the warning and critical thresholds for th
 
 The command output is:
 
-0|server1 is in RUNNING state - status OK|!HeapSize=256M;;;0;512 !UsedMemory=194M;;;0;512
+0|server1 is in RUNNING state, status OK|!HeapSize=256M;;;0;512 !UsedMemory=194M;;;0;512
 
 As you can see, we get the current heap size, the maximum heap size and the amount of memory currently used by the server. If you're using a JRockit JVM, you will also get the amount of CPU used by the server process (see [Jvm jvm] option).
 
@@ -206,7 +206,7 @@ wget -q -O - 'http://localhost:9090/wlsagent/WlsAgent' --post-data='hostname=loc
 
 We get this:
 
-1|server1 is in RUNNING state - status WARNING: memory used (200/512)|!HeapSize=256M;;;0;512 !UsedMemory=200M;;;0;512
+1|server1 is in RUNNING state, status WARNING: memory used (200/512)|!HeapSize=256M;;;0;512 !UsedMemory=200M;;;0;512
 
 A warning alert is raised by the test, as the ratio used memory / maximum memory is superior to 30% (our warning threshold).
 
