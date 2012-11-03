@@ -33,5 +33,5 @@ The !HeapSize is the current heap size at the time the test is performed. The !U
 If this test raises an alert, this kind of message appears at the beginning of the performance data:
 
 {{{
-server1 is in RUNNING state - status CRITICAL - Memory used (501/512)
+server1 is in RUNNING state, status CRITICAL - memory used (501/512)
 }}}
