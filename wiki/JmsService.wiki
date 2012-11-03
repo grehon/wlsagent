@@ -18,7 +18,7 @@ These values are arbitrary values that are compared to the current JMS connectio
 JmsService-current=3
 }}}
 
-The output gives the current number of JMS connections handled by your application server.
+The output gives the current number of JMS connections handled by your application server. If there are several JMS servers deployed on the target JVM, you will get the total number of connections.
 
   * Specific messages
 
