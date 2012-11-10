@@ -23,6 +23,8 @@ import java.text.DecimalFormat;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
+import weblogic.management.runtime.ExecuteThread;
+
 import net.wait4it.wlsagent.utils.Result;
 import net.wait4it.wlsagent.utils.Status;
 
@@ -41,6 +43,7 @@ public class ThreadPoolTest extends TestUtils implements Test {
          * Specific test variables
          */
         DecimalFormat df = new DecimalFormat("0.00");
+        int threadStuckCount = 0;
 
         /**
          * Parse parameters
@@ -53,14 +56,20 @@ public class ThreadPoolTest extends TestUtils implements Test {
             ObjectName threadPoolRuntimeMbean = (ObjectName)connection.getAttribute(serverRuntimeMbean, "ThreadPoolRuntime");
             long threadTotalCount = Long.parseLong(connection.getAttribute(threadPoolRuntimeMbean, "ExecuteThreadTotalCount").toString());
             long threadIdleCount = Long.parseLong(connection.getAttribute(threadPoolRuntimeMbean, "ExecuteThreadIdleCount").toString());
-            long threadActiveCount = threadTotalCount - threadIdleCount;
+            ExecuteThread threadsArray[] = (ExecuteThread[])connection.getAttribute(threadPoolRuntimeMbean, "ExecuteThreads");
             double throughput = Double.parseDouble(connection.getAttribute(threadPoolRuntimeMbean, "Throughput").toString());
+            long threadActiveCount = threadTotalCount - threadIdleCount;
+            for (ExecuteThread thread : threadsArray) { 
+                if ((Boolean)thread.isStuck()) 
+                    threadStuckCount += 1; 
+            }   
             output.append("ThreadPoolSize=").append(threadTotalCount).append(" ");
             output.append("ThreadActiveCount=").append(threadActiveCount).append(";;;0;").append(threadTotalCount).append(" ");
+            output.append("ThreadStuckCount=").append(threadStuckCount).append(";;;0;").append(threadTotalCount).append(" ");
             output.append("Throughput=").append(df.format(throughput));
-            code = checkResult(threadActiveCount, threadTotalCount, critical, warning);
+            code = checkResult(threadStuckCount, critical, warning);
             if (code == Status.WARNING.getCode() || code == Status.CRITICAL.getCode())
-                result.setMessage("thread pool active count (" + threadActiveCount + "/" + threadTotalCount + ")");
+                result.setMessage("thread pool stuck count (" + threadStuckCount + "/" + threadTotalCount + ")");
         } catch (Exception e) {
             e.printStackTrace();
             result.setStatus(Status.UNKNOWN);
