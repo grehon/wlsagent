@@ -12,36 +12,35 @@ In order to use the plugin, you need a suitable 1.6 SDK for your operating syste
 
 === Wlsagent in 5 minutes ===
 
-First things first, go to the 'Downloads' section and retrieve the most recent bundle (.tar.gz archive). In this archive, you will find a 'wlsagent' directory with these contents:
+First things first, go to the 'Downloads' section and retrieve the most recent bundle (.tar.gz archive). In this archive, you will find a wlsagent directory with these contents:
 
 {{{
 lib
 run.sh
-wlsagent-r134.jar
+wlsagent-r144.jar
 wlsagent.sh
 }}}
 
 The lib directory contains the required Jetty dependencies. From now on, I will be using an 'org.eclipse.jetty.aggregate' artifact so there is only one jar for the jetty container, plus the servlet api jar.
 
-You have to copy the following files from your product installation into the lib directory:
+The plugin takes advantage of the !WebLogic distribution client code. The simplest approach is to generate the wlfullclient.jar for your distribution. To do so, issue these commands:
 
 {{{
-${WL_HOME}/server/lib/wlclient.jar
-${WL_HOME}/server/lib/wljmxclient.jar
+cd ${WL_HOME}/server/lib/
+java -jar wljarbuilder.jar
 }}}
 
-So 'lib' directory contents should look like this:
+Copy the generated wlfullclient.jar in the lib directory. The directory contents should then look like this:
 
 {{{
 jetty-servlet-7.6.2.v20120308.jar
 servlet-api-2.5.jar
-wlclient.jar
-wljmxclient.jar
+wlfullclient.jar
 }}}
 
-Let's move on to the 'run.sh' script. In this script, you have to set the correct value for JAVA_HOME variable, and you can also specify the host and the port on which the plugin will be listening. Default is '0.0.0.0:9090', which means the plugin will bind on all network interfaces.
+Let's move on to the run.sh script. In this script, you have to set the correct value for JAVA_HOME variable, and you can also specify the host and the port on which the plugin will be listening. Default is '0.0.0.0:9090', which means the plugin will bind on all network interfaces.
 
-End with the wlsagent.sh script, which you should only amend if you have changed the default '9090' port value in the 'run.sh' script.
+End with the wlsagent.sh script, which you should only amend if you have changed the default '9090' port value in the run.sh script.
 
 Then type :
 
@@ -69,6 +68,7 @@ The files provided in the 'Downloads' section have been compiled with a 1.6 SDK 
   * Create a lib directory in your working directory.
   * Copy the servlet-api-2.5.jar in the lib directory.
   * Download the jetty-servlet jar from [http://mvnrepository.com/artifact/org.eclipse.jetty.aggregate/jetty-servlet here], and put it in the lib directory. Make sure the version number matches the version number of the full distribution.
+  * Copy the suitable wlfullclient.jar for your !WebLogic distribution in the lib directory (see 'wlsagent in 5 minutes' section).
   * Check out the project source files:
 
 {{{
@@ -128,7 +128,7 @@ You can use the sample script below to run the plugin:
 cd $(dirname "$0")
 
 JAVA_HOME="/home/wls/Oracle/Middleware/jdk160_29"
-CLASSPATH=".:wlsagent-r134.jar"
+CLASSPATH=".:wlsagent-r144.jar"
 HOST="0.0.0.0"
 PORT="9090"
 
@@ -139,9 +139,9 @@ done
 ${JAVA_HOME}/bin/java -Xmx32m -cp ${CLASSPATH} net.wait4it.wlsagent.WlsAgent ${HOST} ${PORT} > /dev/null 2>&1 &
 }}}
 
-The content of the working directory should look like this :
+The content of the working directory should look like this:
   * the lib directory
-  * the wlsagent-r134.jar file
+  * the wlsagent-r144.jar file
   * the previous shell script (run.sh)
 
 The lib directory contains the jar dependencies for Jetty and the !WebLogic implementation of the 't3' protocol:
@@ -149,8 +149,7 @@ The lib directory contains the jar dependencies for Jetty and the !WebLogic impl
 {{{
 jetty-servlet-7.6.2.v20120308.jar
 servlet-api-2.5.jar
-wlclient.jar
-wljmxclient.jar
+wlfullclient.jar
 }}}
 
 === Using the plugin ===
