@@ -43,6 +43,7 @@ public class ThreadPoolTest extends TestUtils implements Test {
          * Specific test variables
          */
         DecimalFormat df = new DecimalFormat("0.00");
+        int threadHoggingCount = 0;
         int threadStuckCount = 0;
 
         /**
@@ -60,11 +61,14 @@ public class ThreadPoolTest extends TestUtils implements Test {
             double throughput = Double.parseDouble(connection.getAttribute(threadPoolRuntimeMbean, "Throughput").toString());
             long threadActiveCount = threadTotalCount - threadIdleCount;
             for (ExecuteThread thread : threadsArray) { 
+                if ((Boolean)thread.isHogger())
+                    threadHoggingCount += 1;
                 if ((Boolean)thread.isStuck()) 
-                    threadStuckCount += 1; 
-            }   
+                    threadStuckCount += 1;
+            }
             output.append("ThreadPoolSize=").append(threadTotalCount).append(" ");
             output.append("ThreadActiveCount=").append(threadActiveCount).append(";;;0;").append(threadTotalCount).append(" ");
+            output.append("ThreadHoggingCount=").append(threadHoggingCount).append(";;;0;").append(threadTotalCount).append(" ");
             output.append("ThreadStuckCount=").append(threadStuckCount).append(";;;0;").append(threadTotalCount).append(" ");
             output.append("Throughput=").append(df.format(throughput));
             code = checkResult(threadStuckCount, critical, warning);
