@@ -220,3 +220,15 @@ Available options are:
  * [JmsService jms-service]
  * [JmsQueue jms-queue]
  * [Component component]
+
+=== Screenshots ===
+
+http://wlsagent.googlecode.com/svn/wiki/images/image_001.png
+
+http://wlsagent.googlecode.com/svn/wiki/images/image_002.png
+
+http://wlsagent.googlecode.com/svn/wiki/images/image_003.png
+
+http://wlsagent.googlecode.com/svn/wiki/images/image_004.png
+
+http://wlsagent.googlecode.com/svn/wiki/images/image_005.png
