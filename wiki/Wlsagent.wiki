@@ -17,20 +17,29 @@ First things first, go to the 'Downloads' section and retrieve the most recent b
 {{{
 lib
 run.sh
-wlsagent-r144.jar
+wlsagent-r147.jar
 wlsagent.sh
 }}}
 
 The lib directory contains the required Jetty dependencies. From now on, I will be using an 'org.eclipse.jetty.aggregate' artifact so there is only one jar for the jetty container, plus the servlet api jar.
 
-The plugin takes advantage of the !WebLogic distribution client code. The simplest approach is to generate the wlfullclient.jar for your distribution. To do so, issue these commands:
+You have to add some files to the plugin classpath. You can use the existing wlclient.jar and wljmxclient.jar files (located in ${WL_HOME}/server/lib directory), or generate the wlfullclient.jar for your distribution. To do so, issue these commands:
 
 {{{
 cd ${WL_HOME}/server/lib/
 java -jar wljarbuilder.jar
 }}}
 
-Copy the generated wlfullclient.jar in the lib directory. The directory contents should then look like this:
+Copy the file(s) in the lib directory. The directory contents should then look like this:
+
+{{{
+jetty-servlet-7.6.2.v20120308.jar
+servlet-api-2.5.jar
+wlclient.jar
+wljmxclient.jar
+}}}
+
+or this:
 
 {{{
 jetty-servlet-7.6.2.v20120308.jar
@@ -141,10 +150,19 @@ ${JAVA_HOME}/bin/java -Xmx32m -cp ${CLASSPATH} net.wait4it.wlsagent.WlsAgent ${H
 
 The content of the working directory should look like this:
   * the lib directory
-  * the wlsagent-r144.jar file
+  * the wlsagent-r147.jar file
   * the previous shell script (run.sh)
 
 The lib directory contains the jar dependencies for Jetty and the !WebLogic implementation of the 't3' protocol:
+
+{{{
+jetty-servlet-7.6.2.v20120308.jar
+servlet-api-2.5.jar
+wlclient.jar
+wljmxclient.jar
+}}}
+
+or:
 
 {{{
 jetty-servlet-7.6.2.v20120308.jar
