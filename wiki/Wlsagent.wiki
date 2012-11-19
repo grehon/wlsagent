@@ -23,29 +23,14 @@ wlsagent.sh
 
 The lib directory contains the required Jetty dependencies. From now on, I will be using an 'org.eclipse.jetty.aggregate' artifact so there is only one jar for the jetty container, plus the servlet api jar.
 
-You have to add some files to the plugin classpath. You can create symbolic links to the existing weblogic.jar, wlclient.jar and wljmxclient.jar files (located in ${WL_HOME}/server/lib directory), or generate the wlfullclient.jar for your distribution. To do so, issue these commands:
-
-{{{
-cd ${WL_HOME}/server/lib/
-java -jar wljarbuilder.jar
-}}}
-
-Copy the file(s) in the lib directory. The directory contents should then look like this:
+You have to add some files to the plugin classpath, by creating symbolic links to the existing weblogic.jar, wlclient.jar and wljmxclient.jar files (located in ${WL_HOME}/server/lib directory). The directory contents should then look like this:
 
 {{{
 jetty-servlet-7.6.2.v20120308.jar
 servlet-api-2.5.jar
-weblogic.jar (link)
-wlclient.jar (link)
-wljmxclient.jar (link)
-}}}
-
-or this:
-
-{{{
-jetty-servlet-7.6.2.v20120308.jar
-servlet-api-2.5.jar
-wlfullclient.jar
+@weblogic.jar
+@wlclient.jar
+@wljmxclient.jar
 }}}
 
 Let's move on to the run.sh script. In this script, you have to set the correct value for JAVA_HOME variable, and you can also specify the host and the port on which the plugin will be listening. Default is '0.0.0.0:9090', which means the plugin will bind on all network interfaces.
@@ -159,17 +144,9 @@ The lib directory contains the jar dependencies for Jetty and the !WebLogic impl
 {{{
 jetty-servlet-7.6.2.v20120308.jar
 servlet-api-2.5.jar
-weblogic.jar (link)
-wlclient.jar (link)
-wljmxclient.jar (link)
-}}}
-
-or:
-
-{{{
-jetty-servlet-7.6.2.v20120308.jar
-servlet-api-2.5.jar
-wlfullclient.jar
+@weblogic.jar
+@wlclient.jar
+@wljmxclient.jar
 }}}
 
 === Using the plugin ===
