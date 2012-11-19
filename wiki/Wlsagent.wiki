@@ -23,7 +23,7 @@ wlsagent.sh
 
 The lib directory contains the required Jetty dependencies. From now on, I will be using an 'org.eclipse.jetty.aggregate' artifact so there is only one jar for the jetty container, plus the servlet api jar.
 
-You have to add some files to the plugin classpath, by creating symbolic links to the existing weblogic.jar, wlclient.jar and wljmxclient.jar files (located in ${WL_HOME}/server/lib directory). The directory contents should then look like this:
+You have to add some files to the plugin classpath, by creating symbolic links to the existing weblogic.jar, wlclient.jar and wljmxclient.jar files of your WebLogic distribution (located in ${WL_HOME}/server/lib directory). The directory contents should then look like this:
 
 {{{
 jetty-servlet-7.6.2.v20120308.jar
