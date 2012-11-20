@@ -21,6 +21,7 @@ package net.wait4it.wlsagent;
 
 import java.net.InetSocketAddress;
 
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -39,6 +40,11 @@ public class WlsAgent {
         int port = Integer.parseInt(args[1]);
         InetSocketAddress address = new InetSocketAddress(host, port);
         Server server = new Server(address);
+
+        // Timout for incoming HTTP requests
+        for (Connector connector : server.getConnectors()) {
+            connector.setMaxIdleTime(55000);
+        }
 
         ServletContextHandler handler = new ServletContextHandler(ServletContextHandler.SESSIONS);
         handler.setContextPath("/wlsagent");
