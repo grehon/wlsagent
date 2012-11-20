@@ -127,11 +127,13 @@ HOST="0.0.0.0"
 PORT="9090"
 
 CLASSPATH=".:wlsagent-r147.jar"
-CLASSPATH="${CLASSPATH}:lib/servlet-api-2.5.jar" 
-CLASSPATH="${CLASSPATH}:lib/jetty-servlet-7.6.2.v20120308.jar" 
-CLASSPATH="${CLASSPATH}:lib/wlclient.jar" 
-CLASSPATH="${CLASSPATH}:lib/wljmxclient.jar" 
-CLASSPATH="${CLASSPATH}:lib/weblogic.jar"
+
+# Add Jetty dependencies to the plugin classpath.
+CLASSPATH="${CLASSPATH}:lib/servlet-api-2.5.jar:lib/jetty-servlet-7.6.2.v20120308.jar" 
+
+# Add WebLogic dependencies to the plugin classpath.
+# The 'wljmxclient.jar' must be loaded before the 'weblogic.jar'.
+CLASSPATH="${CLASSPATH}:lib/wlclient.jar:lib/wljmxclient.jar:lib/weblogic.jar"
 
 ${JAVA_HOME}/bin/java -Xmx32m -cp ${CLASSPATH} net.wait4it.wlsagent.WlsAgent ${HOST} ${PORT} > /dev/null 2>&1 &
 }}}
