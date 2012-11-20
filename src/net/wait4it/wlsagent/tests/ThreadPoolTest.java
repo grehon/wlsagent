@@ -43,6 +43,7 @@ public class ThreadPoolTest extends TestUtils implements Test {
          * Specific test variables
          */
         DecimalFormat df = new DecimalFormat("0.00");
+        int threadIdleCount = 0;
         int threadHoggingCount = 0;
         int threadStuckCount = 0;
 
@@ -55,17 +56,18 @@ public class ThreadPoolTest extends TestUtils implements Test {
 
         try {
             ObjectName threadPoolRuntimeMbean = (ObjectName)connection.getAttribute(serverRuntimeMbean, "ThreadPoolRuntime");
-            long threadTotalCount = Long.parseLong(connection.getAttribute(threadPoolRuntimeMbean, "ExecuteThreadTotalCount").toString());
-            long threadIdleCount = Long.parseLong(connection.getAttribute(threadPoolRuntimeMbean, "ExecuteThreadIdleCount").toString());
-            ExecuteThread threadsArray[] = (ExecuteThread[])connection.getAttribute(threadPoolRuntimeMbean, "ExecuteThreads");
             double throughput = Double.parseDouble(connection.getAttribute(threadPoolRuntimeMbean, "Throughput").toString());
-            long threadActiveCount = threadTotalCount - threadIdleCount;
+            ExecuteThread threadsArray[] = (ExecuteThread[])connection.getAttribute(threadPoolRuntimeMbean, "ExecuteThreads");
             for (ExecuteThread thread : threadsArray) { 
+                if ((Boolean)thread.isIdle())
+                    threadIdleCount += 1;
                 if ((Boolean)thread.isHogger())
                     threadHoggingCount += 1;
                 if ((Boolean)thread.isStuck()) 
                     threadStuckCount += 1;
             }
+            int threadTotalCount = threadsArray.length;
+            int threadActiveCount = threadTotalCount - threadIdleCount;
             output.append("ThreadPoolSize=").append(threadTotalCount).append(" ");
             output.append("ThreadActiveCount=").append(threadActiveCount).append(";;;0;").append(threadTotalCount).append(" ");
             output.append("ThreadHoggingCount=").append(threadHoggingCount).append(";;;0;").append(threadTotalCount).append(" ");
