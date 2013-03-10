@@ -28,7 +28,7 @@ import net.wait4it.nagios.wlsagent.core.WLSProxy;
  * @author Yann Lambret
  * @author Kiril Dunn
  */
-public class JtaTest extends TestUtils implements Test {
+public class JTATest extends TestUtils implements Test {
 
     public Result run(WLSProxy proxy, String params) {
         // Test result
