@@ -19,6 +19,7 @@
 package net.wait4it.nagios.wlsagent.core;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -31,6 +32,10 @@ import javax.servlet.http.HttpServletResponse;
 
 
 /**
+ * Builds a HashMap with the HTTP query parameters,
+ * calls WLSStatsManager process method and display
+ * the result as plain old text
+ * 
  * @author Yann Lambret
  *
  */
@@ -41,7 +46,7 @@ public class WLSServlet extends HttpServlet {
     @SuppressWarnings("unchecked")
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Map<String,String> params = new HashMap<String,String>();
-        WLSStatsManager module = new WLSStatsManager();
+        WLSStatsManager manager = new WLSStatsManager();
 
         for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
             String param = e.nextElement();
@@ -50,7 +55,10 @@ public class WLSServlet extends HttpServlet {
 
         response.setContentType("text/plain");
         response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().println(module.run(params));
+
+        PrintWriter out = response.getWriter();
+        out.print(manager.process(params));
+        out.flush();
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
