@@ -29,6 +29,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 /**
  * @author Yann Lambret
+ * 
  */
 public class WLSAgent {
 
@@ -37,16 +38,20 @@ public class WLSAgent {
     }
 
     public static void main(String[] args) throws Exception {
+        // Jetty server connector is created from plugin arguments
         String host = args[0];
         int port = Integer.parseInt(args[1]);
+        
+        // Jetty server setup
         InetSocketAddress address = new InetSocketAddress(host, port);
         Server server = new Server(address);
 
         // Timout for incoming HTTP requests
         for (Connector connector : server.getConnectors()) {
-            connector.setMaxIdleTime(55000);
+            connector.setMaxIdleTime(25000);
         }
 
+        // We add the 'WLSServlet' as a unique entry point
         ServletContextHandler handler = new ServletContextHandler(ServletContextHandler.SESSIONS);
         handler.setContextPath("/wlsagent");
         server.setHandler(handler);
