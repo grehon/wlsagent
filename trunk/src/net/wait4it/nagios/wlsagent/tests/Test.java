@@ -16,7 +16,7 @@
  * 
  */
 
-package net.wait4it.wlsagent.tests;
+package net.wait4it.nagios.wlsagent.tests;
 
 import net.wait4it.nagios.wlsagent.core.Result;
 import net.wait4it.nagios.wlsagent.core.WLSProxy;

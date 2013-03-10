@@ -16,7 +16,7 @@
  * 
  */
 
-package net.wait4it.wlsagent.tests;
+package net.wait4it.nagios.wlsagent.tests;
 
 import java.util.ArrayList;
 import java.util.Arrays;
