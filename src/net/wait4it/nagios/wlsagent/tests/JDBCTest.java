@@ -34,7 +34,7 @@ import net.wait4it.nagios.wlsagent.core.WLSProxy;
  * @author Yann Lambret
  * @author Kiril Dunn
  */
-public class JdbcTest extends TestUtils implements Test {
+public class JDBCTest extends TestUtils implements Test {
 
     public Result run(WLSProxy proxy, String params) {
         // Test result
