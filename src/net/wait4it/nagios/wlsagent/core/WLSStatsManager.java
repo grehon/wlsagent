@@ -20,12 +20,6 @@ package net.wait4it.nagios.wlsagent.core;
 
 import java.util.Map;
 
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
-
-import net.wait4it.wlsagent.jmx.JmxService;
-import net.wait4it.wlsagent.tests.BaseTest;
-
 /**
  * @author Yann Lambret
  * @author Kiril Dunn
@@ -36,43 +30,51 @@ public class WLSStatsManager {
     private final StringBuilder header = new StringBuilder();
     private final StringBuilder message = new StringBuilder();
     private final StringBuilder output = new StringBuilder();
-    private final BaseTest baseTest = new BaseTest();
     private String status = "OK";
     private int code = 0;
 
-    public String run(Map<String, String> params) {
-        MBeanServerConnection connection;
-        ObjectName serverRuntimeMbean;
-        Result result;
+    /**
+     * Instantiates a WebLogic proxy, and run all
+     * the required tests based on the params contents.
+     * 
+     * @param  params HTTP request params
+     * @return output Nagios performance data
+     */
+    public String process(Map<String, String> params) {
+        WLSProxy proxy = null;
+        String serverName = "";
+        String serverState = "";
 
         try {
-            connection = JmxService.getConnection(params);
-            serverRuntimeMbean = JmxService.getServerRuntime(connection);
+            proxy = new WLSProxy(params);
+            proxy.init();
+            serverName = proxy.getServerName();
+            serverState = proxy.getServerState();
         } catch (Exception e) {
             e.printStackTrace();
             return "3|" + e;
         }
 
-        result = baseTest.run(connection, serverRuntimeMbean);
-        header.append(result.getMessage()).append(", ");
+        header.append(serverName + " is in " + serverState + " state, ");
 
-        if (result.getStatus().equals(Status.CRITICAL)) {
+        if (! serverState.equals("RUNNING")) {
             code = 2;
             status = "CRITICAL";
-        } else if (result.getStatus().equals(Status.UNKNOWN)) {
-            code = 3;
-            status = "UNKNOWN";
         }
-                
+
         for (Option option : Option.values()) {
-            if (params.containsKey(option.getName()))
-                checkResult(option.getTest().run(connection, serverRuntimeMbean, params.get(option.getName())));
+            if (params.containsKey(option.getName())) {
+                checkResult(option.getTest().run(proxy, params.get(option.getName())));
+            }
         }
 
         header.append("status ").append(status);
 
-        if (! status.equals("OK") && message.length() > 0)
+        // Something went wrong. We should get useful information
+        // from the message string
+        if (! status.equals("OK") && message.length() > 0) {
             header.append(" - ").append(message.toString());
+        }
 
         output.insert(0, header + "|");
         output.insert(0, code + "|");

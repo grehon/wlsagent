@@ -18,14 +18,14 @@
 
 package net.wait4it.nagios.wlsagent.core;
 
-import net.wait4it.wlsagent.tests.ComponentTest;
-import net.wait4it.wlsagent.tests.JdbcTest;
-import net.wait4it.wlsagent.tests.JmsQueueTest;
-import net.wait4it.wlsagent.tests.JmsServiceTest;
-import net.wait4it.wlsagent.tests.JtaTest;
-import net.wait4it.wlsagent.tests.JvmTest;
-import net.wait4it.wlsagent.tests.Test;
-import net.wait4it.wlsagent.tests.ThreadPoolTest;
+import net.wait4it.nagios.wlsagent.tests.ComponentTest;
+import net.wait4it.nagios.wlsagent.tests.JdbcTest;
+import net.wait4it.nagios.wlsagent.tests.JmsQueueTest;
+import net.wait4it.nagios.wlsagent.tests.JmsServiceTest;
+import net.wait4it.nagios.wlsagent.tests.JtaTest;
+import net.wait4it.nagios.wlsagent.tests.JvmTest;
+import net.wait4it.nagios.wlsagent.tests.Test;
+import net.wait4it.nagios.wlsagent.tests.ThreadPoolTest;
 
 /**
  * @author Yann Lambret
@@ -36,7 +36,7 @@ public enum Option {
     THREADPOOL ( "thread-pool", new ThreadPoolTest() ),
     JTA        ( "jta", new JtaTest() ),
     JDBC       ( "jdbc", new JdbcTest() ),
-    JMSSERVICE ( "jms-service", new JmsServiceTest() ),
+    JMSRUNTIME ( "jms-runtime", new JmsServiceTest() ),
     JMSQUEUE   ( "jms-queue", new JmsQueueTest() ),
     COMPONENT  ( "component", new ComponentTest() );
 
