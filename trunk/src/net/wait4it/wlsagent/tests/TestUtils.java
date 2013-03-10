@@ -18,6 +18,9 @@
 
 package net.wait4it.wlsagent.tests;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * @author Yann Lambret
  * @author Kiril Dunn
@@ -46,6 +49,30 @@ public abstract class TestUtils {
         }
 
         return code;
+    }
+    
+    public String formatOut(List<String> list) {
+        StringBuilder sb = new StringBuilder();
+        if (! list.isEmpty()) {
+            Collections.sort(list);
+            sb.append(list.remove(0));
+            while(! list.isEmpty()) {
+                sb.append(" ").append(list.remove(0));
+            }
+        }
+        return sb.toString();
+    }
+
+    public String formatMsg(String prefix, List<String> list) {
+        StringBuilder sb = new StringBuilder();
+        if (! list.isEmpty()) {
+            Collections.sort(list);
+            sb.append(prefix).append(list.remove(0));
+            while(! list.isEmpty()) {
+                sb.append(", ").append(list.remove(0));
+            }
+        }
+        return sb.toString();
     }
 
     public static long format(Long value) {

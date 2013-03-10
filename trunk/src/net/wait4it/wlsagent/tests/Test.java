@@ -18,10 +18,8 @@
 
 package net.wait4it.wlsagent.tests;
 
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
-
-import net.wait4it.wlsagent.utils.Result;
+import net.wait4it.nagios.wlsagent.core.Result;
+import net.wait4it.nagios.wlsagent.core.WLSProxy;
 
 /**
  * @author Yann Lambret
@@ -29,6 +27,6 @@ import net.wait4it.wlsagent.utils.Result;
  */
 public interface Test {
 
-    Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params);
+    Result run(WLSProxy proxy, String params);
 
 }

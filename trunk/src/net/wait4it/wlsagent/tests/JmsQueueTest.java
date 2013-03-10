@@ -19,16 +19,16 @@
 package net.wait4it.wlsagent.tests;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
-import net.wait4it.wlsagent.utils.Result;
-import net.wait4it.wlsagent.utils.Status;
+import net.wait4it.nagios.wlsagent.core.Result;
+import net.wait4it.nagios.wlsagent.core.Status;
+import net.wait4it.nagios.wlsagent.core.WLSProxy;
 
 /**
  * @author Yann Lambret
@@ -36,57 +36,70 @@ import net.wait4it.wlsagent.utils.Status;
  */
 public class JmsQueueTest extends TestUtils implements Test {
 
-    public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
+    public Result run(WLSProxy proxy, String params) {
+        // Test result
         Result result = new Result();
-        List<String> output = new ArrayList<String>();      
+
+        // Test performance data
+        List<String> output = new ArrayList<String>();
+
+        // Test specific messages
+        List<String> message = new ArrayList<String>();
+
+        // Test overall status code
         int code = 0;
 
-        /**
-         * Specific test variables
-         */
-        Map<String,String> destinations = new HashMap<String,String>();
-        List<String> alerts = new ArrayList<String>();
-        String[] thresholdsArray;
+        // Test thresholds
+        long warning;
+        long critical;
 
-        /**
-         * Populate the HashMap with JMS destination name
-         * keys and string values like 'warning;critical'
-         */
-        String[] paramsArray = params.split("\\|");
-        for (String param : paramsArray) {
-            String[] destinationsArray = param.split(";", 2);
-            destinations.put(destinationsArray[0], destinationsArray[1]);
+        Map<String,String> destinations = new HashMap<String,String>();
+        String thresholds = "";
+
+        // Test code for a specific queue
+        int testCode = 0;
+
+        // Message prefix
+        String prefix = "JMS message count: ";
+
+        // Performance data
+        String destinationName;
+        long messagesCurrentCount;
+        long messagesPendingCount;
+
+        // Parses HTTP query params
+        for (String s : Arrays.asList(params.split("\\|"))) {
+            destinations.put(s.split(",", 2)[0], s.split(",", 2)[1]);
         }
 
         try {
-            ObjectName jmsRuntimeMbean = (ObjectName)connection.getAttribute(serverRuntimeMbean, "JMSRuntime");
-            ObjectName[] jmsServerRuntimeMbeans = (ObjectName[])connection.getAttribute(jmsRuntimeMbean, "JMSServers");
+            ObjectName jmsRuntimeMbean = proxy.getMBean("JMSRuntime");
+            ObjectName[] jmsServerRuntimeMbeans = proxy.getMBeans(jmsRuntimeMbean, "JMSServers");
             for (ObjectName jmsServerRuntime : jmsServerRuntimeMbeans) {
-                ObjectName[] jmsDestinationRuntimeMbeans = (ObjectName[])connection.getAttribute(jmsServerRuntime, "Destinations");
+                ObjectName[] jmsDestinationRuntimeMbeans = proxy.getMBeans(jmsServerRuntime, "Destinations");
                 for (ObjectName jmsDestinationRuntime : jmsDestinationRuntimeMbeans) {
-                    String destinationName = connection.getAttribute(jmsDestinationRuntime, "Name").toString();
-                    if (destinationName.split("@").length == 2)
+                    destinationName = (String)proxy.getAttribute(jmsDestinationRuntime, "Name");
+                    if (destinationName.split("@").length == 2) {
                         destinationName = destinationName.split("@")[1];
-                    if (destinationName.split("!").length == 2)
+                    }
+                    if (destinationName.split("!").length == 2) {
                         destinationName = destinationName.split("!")[1];
+                    }
                     if (destinations.containsKey("*") || destinations.containsKey(destinationName)) {
-                        long messagesCurrentCount = Long.parseLong(connection.getAttribute(jmsDestinationRuntime, "MessagesCurrentCount").toString());
-                        long messagesPendingCount = Long.parseLong(connection.getAttribute(jmsDestinationRuntime, "MessagesPendingCount").toString());
+                        messagesCurrentCount = (Long)proxy.getAttribute(jmsDestinationRuntime, "MessagesCurrentCount");
+                        messagesPendingCount = (Long)proxy.getAttribute(jmsDestinationRuntime, "MessagesPendingCount");
                         StringBuilder out = new StringBuilder();
                         out.append("JmsQueue-").append(destinationName).append("-current=").append(messagesCurrentCount).append(" ");
                         out.append("JmsQueue-").append(destinationName).append("-pending=").append(messagesPendingCount);
                         output.add(out.toString());
-                        if (destinations.containsKey("*"))
-                            thresholdsArray = destinations.get("*").split(";");
-                        else
-                            thresholdsArray = destinations.get(destinationName).split(";");
-                        long warning = Long.parseLong(thresholdsArray[0]);
-                        long critical = Long.parseLong(thresholdsArray[1]);
-                        int testCode = checkResult(messagesCurrentCount, critical, warning);
-                        if (testCode == Status.WARNING.getCode() || testCode == Status.CRITICAL.getCode())
-                            alerts.add(destinationName + " (" + messagesCurrentCount + ")");
-                        if (testCode > code)
-                            code = testCode;
+                        thresholds = destinations.get("*") != null ? destinations.get("*") : destinations.get(destinationName);
+                        warning = Long.parseLong(thresholds.split(",")[0]);
+                        critical = Long.parseLong(thresholds.split(",")[1]);
+                        testCode = checkResult(messagesCurrentCount, critical, warning);
+                        if (testCode == Status.WARNING.getCode() || testCode == Status.CRITICAL.getCode()) {
+                            message.add(destinationName + " (" + messagesCurrentCount + ")");
+                            code = (testCode > code) ? testCode : code;
+                        }
                     }
                 }
             }
@@ -97,7 +110,6 @@ public class JmsQueueTest extends TestUtils implements Test {
             return result;
         }
 
-        // Set result status
         for (Status status : Status.values()) {
             if (code == status.getCode()) {
                 result.setStatus(status);           
@@ -105,23 +117,8 @@ public class JmsQueueTest extends TestUtils implements Test {
             }
         }
 
-        // Set result message
-        if (! alerts.isEmpty()) {
-            Collections.sort(alerts);
-            StringBuilder sb = new StringBuilder(alerts.remove(0));
-            while(! alerts.isEmpty())
-                sb.append(", ").append(alerts.remove(0));
-            result.setMessage("JMS message count: " + sb.toString());
-        }
-
-        // Set result output
-        if (! output.isEmpty()) {
-            Collections.sort(output);
-            StringBuilder sb = new StringBuilder(output.remove(0));
-            while(! output.isEmpty())
-                sb.append(" ").append(output.remove(0));
-            result.setOutput(sb.toString());
-        }
+        result.setOutput(formatOut(output));
+        result.setMessage(formatMsg(prefix, message));
 
         return result;
     }

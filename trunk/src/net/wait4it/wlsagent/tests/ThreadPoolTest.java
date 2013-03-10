@@ -20,13 +20,13 @@ package net.wait4it.wlsagent.tests;
 
 import java.text.DecimalFormat;
 
-import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
 import weblogic.management.runtime.ExecuteThread;
 
-import net.wait4it.wlsagent.utils.Result;
-import net.wait4it.wlsagent.utils.Status;
+import net.wait4it.nagios.wlsagent.core.Result;
+import net.wait4it.nagios.wlsagent.core.Status;
+import net.wait4it.nagios.wlsagent.core.WLSProxy;
 
 /**
  * @author Yann Lambret
@@ -34,48 +34,61 @@ import net.wait4it.wlsagent.utils.Status;
  */
 public class ThreadPoolTest extends TestUtils implements Test {
 
-    public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
+    private static final DecimalFormat DF = new DecimalFormat("0.00");
+
+    public Result run(WLSProxy proxy, String params) {
+        // Test result
         Result result = new Result();
-        StringBuilder output = new StringBuilder();
+
+        // Test overall status code
         int code = 0;
 
-        /**
-         * Specific test variables
-         */
-        DecimalFormat df = new DecimalFormat("0.00");
+        // Test thresholds
+        long warning;
+        long critical;
+
+        // Performance data
+        ExecuteThread threadsArray[];
         int threadIdleCount = 0;
         int threadHoggingCount = 0;
         int threadStuckCount = 0;
+        int threadTotalCount;
+        int threadActiveCount;
+        double throughput;
 
-        /**
-         * Parse parameters
-         */
-        String[] paramsArray = params.split(";");
-        long warning = Long.parseLong(paramsArray[1]);
-        long critical = Long.parseLong(paramsArray[2]);
+        // Parses HTTP query params
+        String[] paramsArray = params.split(",");
+        warning = Long.parseLong(paramsArray[1]);
+        critical = Long.parseLong(paramsArray[2]);
 
         try {
-            ObjectName threadPoolRuntimeMbean = (ObjectName)connection.getAttribute(serverRuntimeMbean, "ThreadPoolRuntime");
-            double throughput = Double.parseDouble(connection.getAttribute(threadPoolRuntimeMbean, "Throughput").toString());
-            ExecuteThread threadsArray[] = (ExecuteThread[])connection.getAttribute(threadPoolRuntimeMbean, "ExecuteThreads");
+            ObjectName threadPoolRuntimeMbean = proxy.getMBean("ThreadPoolRuntime");
+            throughput = (Double)proxy.getAttribute(threadPoolRuntimeMbean, "Throughput");
+            threadsArray = (ExecuteThread[])proxy.getAttribute(threadPoolRuntimeMbean, "ExecuteThreads");
             for (ExecuteThread thread : threadsArray) { 
-                if ((Boolean)thread.isIdle())
+                if ((Boolean)thread.isIdle()) {
                     threadIdleCount += 1;
-                if ((Boolean)thread.isHogger())
+                }
+                if ((Boolean)thread.isHogger()) {
                     threadHoggingCount += 1;
-                if ((Boolean)thread.isStuck()) 
+                }
+                if ((Boolean)thread.isStuck()) { 
                     threadStuckCount += 1;
+                }
             }
-            int threadTotalCount = threadsArray.length;
-            int threadActiveCount = threadTotalCount - threadIdleCount;
-            output.append("ThreadPoolSize=").append(threadTotalCount).append(" ");
-            output.append("ThreadActiveCount=").append(threadActiveCount).append(";;;0;").append(threadTotalCount).append(" ");
-            output.append("ThreadHoggingCount=").append(threadHoggingCount).append(";;;0;").append(threadTotalCount).append(" ");
-            output.append("ThreadStuckCount=").append(threadStuckCount).append(";;;0;").append(threadTotalCount).append(" ");
-            output.append("Throughput=").append(df.format(throughput));
+            threadTotalCount = threadsArray.length;
+            threadActiveCount = threadTotalCount - threadIdleCount;
+            StringBuilder out = new StringBuilder();
+            out.append("ThreadPoolSize=").append(threadTotalCount).append(" ");
+            out.append("ThreadActiveCount=").append(threadActiveCount).append(";;;0;").append(threadTotalCount).append(" ");
+            out.append("ThreadHoggingCount=").append(threadHoggingCount).append(";;;0;").append(threadTotalCount).append(" ");
+            out.append("ThreadStuckCount=").append(threadStuckCount).append(";;;0;").append(threadTotalCount).append(" ");
+            out.append("Throughput=").append(DF.format(throughput));
+            result.setOutput(out.toString());
             code = checkResult(threadStuckCount, critical, warning);
-            if (code == Status.WARNING.getCode() || code == Status.CRITICAL.getCode())
+            if (code == Status.WARNING.getCode() || code == Status.CRITICAL.getCode()) {
                 result.setMessage("thread pool stuck count (" + threadStuckCount + "/" + threadTotalCount + ")");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             result.setStatus(Status.UNKNOWN);
@@ -83,11 +96,9 @@ public class ThreadPoolTest extends TestUtils implements Test {
             return result;
         }
 
-        // Set result status and output
         for (Status status : Status.values()) {
             if (code == status.getCode()) {
                 result.setStatus(status);
-                result.setOutput(output.toString());
                 break;
             }
         }

@@ -19,11 +19,11 @@
 package net.wait4it.wlsagent.tests;
 
 import javax.management.AttributeNotFoundException;
-import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
-import net.wait4it.wlsagent.utils.Result;
-import net.wait4it.wlsagent.utils.Status;
+import net.wait4it.nagios.wlsagent.core.Result;
+import net.wait4it.nagios.wlsagent.core.Status;
+import net.wait4it.nagios.wlsagent.core.WLSProxy;
 
 /**
  * @author Yann Lambret
@@ -31,32 +31,45 @@ import net.wait4it.wlsagent.utils.Status;
  */
 public class JvmTest extends TestUtils implements Test {
 
-    public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
+    public Result run(WLSProxy proxy, String params) {
+        // Test result
         Result result = new Result();
-        StringBuilder output = new StringBuilder();
+
+        // Test overall status code
         int code = 0;
 
-        /**
-         * Parse parameters
-         */
-        String[] paramsArray = params.split(";");
-        long warning = Long.parseLong(paramsArray[1]);
-        long critical = Long.parseLong(paramsArray[2]);
+        // Test thresholds
+        long warning;
+        long critical;
+
+        // Performance data
+        long heapSizeMax;
+        long heapSizeCurrent;
+        long heapFreeCurrent;
+        long heapUsedCurrent;
+        double jvmProcessorLoad;
+
+        // Parses HTTP query params
+        String[] paramsArray = params.split(",");
+        warning = Long.parseLong(paramsArray[1]);
+        critical = Long.parseLong(paramsArray[2]);
 
         try {
-            ObjectName jvmRuntimeMbean = (ObjectName)connection.getAttribute(serverRuntimeMbean, "JVMRuntime");
-            long heapSizeMax = format((Long)connection.getAttribute(jvmRuntimeMbean, "HeapSizeMax"));
-            long heapSizeCurrent = format((Long)connection.getAttribute(jvmRuntimeMbean, "HeapSizeCurrent"));
-            long heapFreeCurrent = format((Long)connection.getAttribute(jvmRuntimeMbean, "HeapFreeCurrent"));
-            long heapUsedCurrent = heapSizeCurrent - heapFreeCurrent;
-            output.append("HeapSize=").append(heapSizeCurrent).append("MB;;;0;").append(heapSizeMax).append(" ");
-            output.append("UsedMemory=").append(heapUsedCurrent).append("MB;;;0;").append(heapSizeMax);
+            ObjectName jvmRuntimeMbean = proxy.getMBean("JVMRuntime");
+            heapSizeMax = format((Long)proxy.getAttribute(jvmRuntimeMbean, "HeapSizeMax"));
+            heapSizeCurrent = format((Long)proxy.getAttribute(jvmRuntimeMbean, "HeapSizeCurrent"));
+            heapFreeCurrent = format((Long)proxy.getAttribute(jvmRuntimeMbean, "HeapFreeCurrent"));
+            heapUsedCurrent = heapSizeCurrent - heapFreeCurrent;
+            StringBuilder out = new StringBuilder();
+            out.append("HeapSize=").append(heapSizeCurrent).append("MB;;;0;").append(heapSizeMax).append(" ");
+            out.append("UsedMemory=").append(heapUsedCurrent).append("MB;;;0;").append(heapSizeMax);
             try {
-                double jvmProcessorLoad = (Double)connection.getAttribute(jvmRuntimeMbean, "JvmProcessorLoad");
-                output.append(" JvmProcessorLoad=").append(Math.round(jvmProcessorLoad * 100)).append("%;;;0;100");
+                jvmProcessorLoad = (Double)proxy.getAttribute(jvmRuntimeMbean, "JvmProcessorLoad");
+                out.append(" JvmProcessorLoad=").append(Math.round(jvmProcessorLoad * 100)).append("%;;;0;100");
             } catch (AttributeNotFoundException ignored) {
                 // Not dealing with a JRockitRuntimeMBean
             }
+            result.setOutput(out.toString());
             code = checkResult(heapUsedCurrent, heapSizeMax, critical, warning);
             if (code == Status.WARNING.getCode() || code == Status.CRITICAL.getCode())
                 result.setMessage("memory used (" + heapUsedCurrent + "/" + heapSizeMax + ")");
@@ -67,11 +80,9 @@ public class JvmTest extends TestUtils implements Test {
             return result;
         }
 
-        // Set result status and output
         for (Status status : Status.values()) {
             if (code == status.getCode()) {
                 result.setStatus(status);
-                result.setOutput(output.toString());
                 break;
             }
         }

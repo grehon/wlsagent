@@ -19,16 +19,16 @@
 package net.wait4it.wlsagent.tests;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
-import net.wait4it.wlsagent.utils.Result;
-import net.wait4it.wlsagent.utils.Status;
+import net.wait4it.nagios.wlsagent.core.Result;
+import net.wait4it.nagios.wlsagent.core.Status;
+import net.wait4it.nagios.wlsagent.core.WLSProxy;
 
 /**
  * @author Yann Lambret
@@ -36,53 +36,64 @@ import net.wait4it.wlsagent.utils.Status;
  */
 public class JdbcTest extends TestUtils implements Test {
 
-    public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
+    public Result run(WLSProxy proxy, String params) {
+        // Test result
         Result result = new Result();
+
+        // Test performance data
         List<String> output = new ArrayList<String>();
+
+        // Test specific messages
+        List<String> message = new ArrayList<String>();
+
+        // Test overall status code
         int code = 0;
 
-        /**
-         * Specific test variables
-         */
-        Map<String,String> datasources = new HashMap<String,String>();
-        List<String> alerts = new ArrayList<String>();
-        String[] thresholdsArray;
+        // Test thresholds
+        long warning;
+        long critical;
 
-        /**
-         * Populate the HashMap with datasource name keys
-         * and string values like 'warning;critical'
-         */
-        String[] paramsArray = params.split("\\|");
-        for (String param : paramsArray) {
-            String[] datasourcesArray = param.split(";", 2);
-            datasources.put(datasourcesArray[0], datasourcesArray[1]);
+        Map<String,String> datasources = new HashMap<String,String>();
+        String thresholds = "";
+
+        // Test code for a specific datasource
+        int testCode = 0;
+
+        // Message prefix
+        String prefix = "datasource active count: ";
+
+        // Performance data
+        long currCapacity;
+        long activeConnectionsCurrentCount;
+        long waitingForConnectionCurrentCount;
+
+        // Parses HTTP query params
+        for (String s : Arrays.asList(params.split("\\|"))) {
+            datasources.put(s.split(",", 2)[0], s.split(",", 2)[1]);
         }
 
         try {
-            ObjectName jdbcServiceRuntimeMbean = (ObjectName)connection.getAttribute(serverRuntimeMbean, "JDBCServiceRuntime");
-            ObjectName[] jdbcDataSourceRuntimeMbeans = (ObjectName[])connection.getAttribute(jdbcServiceRuntimeMbean, "JDBCDataSourceRuntimeMBeans");
+            ObjectName jdbcServiceRuntimeMbean = proxy.getMBean("JDBCServiceRuntime");
+            ObjectName[] jdbcDataSourceRuntimeMbeans = proxy.getMBeans(jdbcServiceRuntimeMbean, "JDBCDataSourceRuntimeMBeans");
             for (ObjectName datasourceRuntime : jdbcDataSourceRuntimeMbeans) {
-                String datasourceName = connection.getAttribute(datasourceRuntime, "Name").toString();
+                String datasourceName = (String)proxy.getAttribute(datasourceRuntime, "Name");
                 if (datasources.containsKey("*") || datasources.containsKey(datasourceName)) {
-                    long currCapacity = Long.parseLong(connection.getAttribute(datasourceRuntime, "CurrCapacity").toString());
-                    long activeConnectionsCurrentCount = Long.parseLong(connection.getAttribute(datasourceRuntime, "ActiveConnectionsCurrentCount").toString());
-                    long waitingForConnectionCurrentCount = Long.parseLong(connection.getAttribute(datasourceRuntime, "WaitingForConnectionCurrentCount").toString());
+                    currCapacity = (Long)proxy.getAttribute(datasourceRuntime, "CurrCapacity");
+                    activeConnectionsCurrentCount = (Long)proxy.getAttribute(datasourceRuntime, "ActiveConnectionsCurrentCount");
+                    waitingForConnectionCurrentCount = (Long)proxy.getAttribute(datasourceRuntime, "WaitingForConnectionCurrentCount");
                     StringBuilder out = new StringBuilder();
                     out.append("jdbc-").append(datasourceName).append("-capacity=").append(currCapacity).append(" ");
                     out.append("jdbc-").append(datasourceName).append("-active=").append(activeConnectionsCurrentCount).append(" ");
                     out.append("jdbc-").append(datasourceName).append("-waiting=").append(waitingForConnectionCurrentCount);
                     output.add(out.toString());
-                    if (datasources.containsKey("*"))
-                        thresholdsArray = datasources.get("*").split(";");
-                    else
-                        thresholdsArray = datasources.get(datasourceName).split(";");
-                    long warning = Long.parseLong(thresholdsArray[0]);
-                    long critical = Long.parseLong(thresholdsArray[1]);
-                    int testCode = checkResult(waitingForConnectionCurrentCount, critical, warning);
-                    if (testCode == Status.WARNING.getCode() || testCode == Status.CRITICAL.getCode()) 
-                        alerts.add(datasourceName + " (" + waitingForConnectionCurrentCount + ")");
-                    if (testCode > code)
-                        code = testCode;
+                    thresholds = datasources.get("*") != null ? datasources.get("*") : datasources.get(datasourceName);
+                    warning = Long.parseLong(thresholds.split(",")[0]);
+                    critical = Long.parseLong(thresholds.split(",")[1]);
+                    testCode = checkResult(waitingForConnectionCurrentCount, critical, warning);
+                    if (testCode == Status.WARNING.getCode() || testCode == Status.CRITICAL.getCode()) {
+                        message.add(datasourceName + " (" + waitingForConnectionCurrentCount + ")");
+                        code = (testCode > code) ? testCode : code;
+                    }
                 }
             }
         } catch (Exception e) {
@@ -92,7 +103,6 @@ public class JdbcTest extends TestUtils implements Test {
             return result;
         }
 
-        // Set result status
         for (Status status : Status.values()) {
             if (code == status.getCode()) {
                 result.setStatus(status);           
@@ -100,23 +110,8 @@ public class JdbcTest extends TestUtils implements Test {
             }
         }
 
-        // Set result message
-        if (! alerts.isEmpty()) {
-            Collections.sort(alerts);
-            StringBuilder sb = new StringBuilder(alerts.remove(0));
-            while(! alerts.isEmpty())
-                sb.append(", ").append(alerts.remove(0));
-            result.setMessage("JDBC connection waiting count: " + sb.toString());
-        }
-
-        // Set result output
-        if (! output.isEmpty()) {
-            Collections.sort(output);
-            StringBuilder sb = new StringBuilder(output.remove(0));
-            while(! output.isEmpty())
-                sb.append(" ").append(output.remove(0));
-            result.setOutput(sb.toString());
-        }
+        result.setOutput(formatOut(output));
+        result.setMessage(formatMsg(prefix, message));
 
         return result;
     }

@@ -18,11 +18,11 @@
 
 package net.wait4it.wlsagent.tests;
 
-import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
-import net.wait4it.wlsagent.utils.Result;
-import net.wait4it.wlsagent.utils.Status;
+import net.wait4it.nagios.wlsagent.core.Result;
+import net.wait4it.nagios.wlsagent.core.Status;
+import net.wait4it.nagios.wlsagent.core.WLSProxy;
 
 /**
  * @author Yann Lambret
@@ -30,25 +30,33 @@ import net.wait4it.wlsagent.utils.Status;
  */
 public class JtaTest extends TestUtils implements Test {
 
-    public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
+    public Result run(WLSProxy proxy, String params) {
+        // Test result
         Result result = new Result();
-        StringBuilder output = new StringBuilder();
+
+        // Test overall status code
         int code = 0;
 
-        /**
-         * Parse parameters
-         */
-        String[] paramsArray = params.split(";");
-        long warning = Long.parseLong(paramsArray[1]);
-        long critical = Long.parseLong(paramsArray[2]);
+        // Test thresholds
+        long warning;
+        long critical;
+
+        // Performance data
+        long activeTransactionsTotalCount;
+
+        // Parses HTTP query params
+        String[] thresholds = params.split(",");
+        warning = Long.parseLong(thresholds[1]);
+        critical = Long.parseLong(thresholds[2]);
 
         try {
-            ObjectName jtaRuntimeMbean = (ObjectName)connection.getAttribute(serverRuntimeMbean, "JTARuntime");
-            long activeTransactionsTotalCount = Long.parseLong(connection.getAttribute(jtaRuntimeMbean, "ActiveTransactionsTotalCount").toString());
-            output.append("ActiveTransactions=").append(activeTransactionsTotalCount);
+            ObjectName jtaRuntimeMbean = proxy.getMBean("JTARuntime");
+            activeTransactionsTotalCount = (Long)proxy.getAttribute(jtaRuntimeMbean, "ActiveTransactionsTotalCount");
+            result.setOutput("ActiveTransactions=" + activeTransactionsTotalCount);
             code = checkResult(activeTransactionsTotalCount, critical, warning);
-            if (code == Status.WARNING.getCode() || code == Status.CRITICAL.getCode())
+            if (code == Status.WARNING.getCode() || code == Status.CRITICAL.getCode()) {
                 result.setMessage("transaction active count (" + activeTransactionsTotalCount + ")");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             result.setStatus(Status.UNKNOWN);
@@ -56,11 +64,9 @@ public class JtaTest extends TestUtils implements Test {
             return result;
         }
 
-        // Set result status and output
         for (Status status : Status.values()) {
             if (code == status.getCode()) {
                 result.setStatus(status);
-                result.setOutput(output.toString());
                 break;
             }
         }
