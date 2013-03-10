@@ -26,11 +26,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.management.AttributeNotFoundException;
-import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
-import net.wait4it.wlsagent.utils.Result;
-import net.wait4it.wlsagent.utils.Status;
+import net.wait4it.nagios.wlsagent.core.Result;
+import net.wait4it.nagios.wlsagent.core.Status;
+import net.wait4it.nagios.wlsagent.core.WLSProxy;
 
 /**
  * @author Yann Lambret
@@ -50,59 +50,70 @@ public class ComponentTest extends TestUtils implements Test {
             "uddi",
             "uddiexplorer"));
 
-    public Result run(MBeanServerConnection connection, ObjectName serverRuntimeMbean, String params) {
+    public Result run(WLSProxy proxy, String params) {
+        // Test result
         Result result = new Result();
-        List<String> output = new ArrayList<String>();     
+
+        // Test performance data
+        List<String> output = new ArrayList<String>();
+
+        // Test specific messages
+        List<String> message = new ArrayList<String>();
+
+        // Test overall status code
         int code = 0;
 
-        /**
-         * Specific test variables
-         */
-        Map<String,String> components = new HashMap<String,String>();
-        List<String> alerts = new ArrayList<String>();
-        String[] thresholdsArray;
+        // Test thresholds
+        long warning;
+        long critical;
 
-        /**
-         * Populate the HashMap with context root keys
-         * and string values like 'warning;critical'
-         */
-        String[] paramsArray = params.split("\\|");
-        for (String param : paramsArray) {
-            String[] componentsArray = param.split(";", 2);
-            components.put(componentsArray[0], componentsArray[1]);
+        Map<String,String> components = new HashMap<String,String>();
+        String thresholds = "";
+
+        // Test code for a specific application
+        int testCode = 0;
+
+        // Message prefix
+        String prefix = "HTTP session count: ";
+
+        // Performance data
+        String contextRoot;
+        long openSessions;
+
+        // Parses HTTP query params
+        for (String s : Arrays.asList(params.split("\\|"))) {
+            components.put(s.split(",", 2)[0], s.split(",", 2)[1]);
         }
 
         try {
-            ObjectName[] applicationRuntimeMbeans = (ObjectName[])connection.getAttribute(serverRuntimeMbean, "ApplicationRuntimes");
+            ObjectName[] applicationRuntimeMbeans = proxy.getMBeans("ApplicationRuntimes");
             for (ObjectName applicationRuntime : applicationRuntimeMbeans) {
-                ObjectName[] componentRuntimeMbeans = (ObjectName[])connection.getAttribute(applicationRuntime, "ComponentRuntimes");
+                ObjectName[] componentRuntimeMbeans = proxy.getMBeans(applicationRuntime, "ComponentRuntimes");
                 for (ObjectName componentRuntime : componentRuntimeMbeans) {
-                    String contextRoot;
                     try {
-                        contextRoot = connection.getAttribute(componentRuntime, "ContextRoot").toString();
+                        contextRoot = (String)proxy.getAttribute(componentRuntime, "ContextRoot");
                         // The context root may be an empty string or a single character
-                        if (contextRoot.length() > 1)
+                        if (contextRoot.length() > 1) {
                             contextRoot = contextRoot.substring(1);
+                        }
                     } catch (AttributeNotFoundException ignored) {
                         // Our component is not an instance of WebAppComponentRuntimeMBean
                         continue;
                     }
-                    if (EXCLUSIONS.contains(contextRoot))
+                    if (EXCLUSIONS.contains(contextRoot)) {
                         continue;
+                    }
                     if (components.containsKey("*") || components.containsKey(contextRoot)) {
-                        long openSessions = Long.parseLong(connection.getAttribute(componentRuntime, "OpenSessionsCurrentCount").toString());
+                        openSessions = (Long)proxy.getAttribute(componentRuntime, "OpenSessionsCurrentCount");
                         output.add("app-" + contextRoot + "=" + openSessions);
-                        if (components.containsKey("*"))
-                            thresholdsArray = components.get("*").split(";");
-                        else
-                            thresholdsArray = components.get(contextRoot).split(";");
-                        long warning = Long.parseLong(thresholdsArray[0]);
-                        long critical = Long.parseLong(thresholdsArray[1]);
-                        int testCode = checkResult(openSessions, critical, warning);
-                        if (testCode == Status.WARNING.getCode() || testCode == Status.CRITICAL.getCode())
-                            alerts.add(contextRoot + " (" + openSessions + ")");
-                        if (testCode > code)
-                            code = testCode;
+                        thresholds = components.get("*") != null ? components.get("*") : components.get(contextRoot);
+                        warning = Long.parseLong(thresholds.split(",")[0]);
+                        critical = Long.parseLong(thresholds.split(",")[1]);
+                        testCode = checkResult(openSessions, critical, warning);
+                        if (testCode == Status.WARNING.getCode() || testCode == Status.CRITICAL.getCode()) {
+                            message.add(contextRoot + " (" + openSessions + ")");
+                            code = (testCode > code) ? testCode : code;
+                        }
                     }
                 }
             }
@@ -113,7 +124,6 @@ public class ComponentTest extends TestUtils implements Test {
             return result;
         }
 
-        // Set result status
         for (Status status : Status.values()) {
             if (code == status.getCode()) {
                 result.setStatus(status);           
@@ -121,23 +131,8 @@ public class ComponentTest extends TestUtils implements Test {
             }
         }
 
-        // Set result message
-        if (! alerts.isEmpty()) {
-            Collections.sort(alerts);
-            StringBuilder sb = new StringBuilder(alerts.remove(0));
-            while(! alerts.isEmpty())
-                sb.append(", ").append(alerts.remove(0));
-            result.setMessage("HTTP session count: " + sb.toString());
-        }
-
-        // Set result output
-        if (! output.isEmpty()) {
-            Collections.sort(output);
-            StringBuilder sb = new StringBuilder(output.remove(0));
-            while(! output.isEmpty())
-                sb.append(" ").append(output.remove(0));
-            result.setOutput(sb.toString());
-        }
+        result.setOutput(formatOut(output));
+        result.setMessage(formatMsg(prefix, message));
 
         return result;
     }
