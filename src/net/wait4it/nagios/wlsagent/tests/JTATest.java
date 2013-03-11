@@ -31,10 +31,7 @@ import net.wait4it.nagios.wlsagent.core.WLSProxy;
 public class JTATest extends TestUtils implements Test {
 
     public Result run(WLSProxy proxy, String params) {
-        // Test result
         Result result = new Result();
-
-        // Test overall status code
         int code = 0;
 
         // Test thresholds
@@ -42,7 +39,7 @@ public class JTATest extends TestUtils implements Test {
         long critical;
 
         // Performance data
-        long activeTransactionsTotalCount;
+        int activeTransactionsTotalCount;
 
         // Parses HTTP query params
         String[] thresholds = params.split(",");
@@ -51,7 +48,7 @@ public class JTATest extends TestUtils implements Test {
 
         try {
             ObjectName jtaRuntimeMbean = proxy.getMBean("JTARuntime");
-            activeTransactionsTotalCount = (Long)proxy.getAttribute(jtaRuntimeMbean, "ActiveTransactionsTotalCount");
+            activeTransactionsTotalCount = (Integer)proxy.getAttribute(jtaRuntimeMbean, "ActiveTransactionsTotalCount");
             result.setOutput("ActiveTransactions=" + activeTransactionsTotalCount);
             code = checkResult(activeTransactionsTotalCount, critical, warning);
             if (code == Status.WARNING.getCode() || code == Status.CRITICAL.getCode()) {
