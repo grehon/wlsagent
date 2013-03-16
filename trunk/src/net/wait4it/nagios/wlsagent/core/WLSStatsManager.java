@@ -67,6 +67,9 @@ public class WLSStatsManager {
                 checkResult(option.getTest().run(proxy, params.get(option.getName())));
             }
         }
+        
+        // Closes the JMX connector
+        proxy.clean();
 
         header.append("status ").append(status);
 
@@ -107,14 +110,16 @@ public class WLSStatsManager {
         }
 
         if (msg.length() > 0) {
-            if (message.length() > 0)
+            if (message.length() > 0) {
                 message.append(" - ");
+            }
             message.append(msg);
         }
 
         if (out.length() > 0) {
-            if (output.length() > 0)
+            if (output.length() > 0) {
                 output.append(" ");
+            }
             output.append(out);
         }
     }

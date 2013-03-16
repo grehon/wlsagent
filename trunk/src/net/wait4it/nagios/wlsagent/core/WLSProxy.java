@@ -18,6 +18,8 @@
 
 package net.wait4it.nagios.wlsagent.core;
 
+import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -83,11 +85,12 @@ public class WLSProxy {
 
     /**
      * Clean up resources.
-     * 
-     * @throws Exception
      */
-    public void clean() throws Exception {
-        connector.close();
+    public void clean() {
+        try {
+            connector.close();
+        } catch (IOException ignored) {        
+        }
     }
 
     /**
@@ -97,7 +100,7 @@ public class WLSProxy {
      * @throws Exception
      */
     public String getServerName() throws Exception {
-        return connection.getAttribute(serverRuntimeMBean, "Name").toString();
+        return (String)connection.getAttribute(serverRuntimeMBean, "Name");
     }
 
     /**
@@ -107,7 +110,7 @@ public class WLSProxy {
      * @throws Exception
      */
     public String getServerState() throws Exception {
-        return connection.getAttribute(serverRuntimeMBean, "State").toString();
+        return (String)connection.getAttribute(serverRuntimeMBean, "State");
     }
 
     /**
@@ -121,7 +124,7 @@ public class WLSProxy {
     public ObjectName[] getMBeans(ObjectName mbean, String query) throws Exception {
         return (ObjectName[])connection.getAttribute(mbean, query);
     }
-    
+
     public ObjectName[] getMBeans(String query) throws Exception {
         return (ObjectName[])connection.getAttribute(serverRuntimeMBean, query);
     }
@@ -137,7 +140,7 @@ public class WLSProxy {
     public ObjectName getMBean(ObjectName mbean, String query) throws Exception {
         return (ObjectName)connection.getAttribute(mbean, query);
     }
-    
+
     public ObjectName getMBean(String query) throws Exception {
         return (ObjectName)connection.getAttribute(serverRuntimeMBean, query);
     }
