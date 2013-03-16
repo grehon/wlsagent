@@ -26,16 +26,30 @@ import net.wait4it.nagios.wlsagent.core.Status;
 import net.wait4it.nagios.wlsagent.core.WLSProxy;
 
 /**
+ * Gets statistics for the the target
+ * WLS instance JVM.
+ * 
+ * The following metrics are available:
+ * 
+ *   - The JVM current heap size (MB)
+ *   - The JVM maximum heap size (MB)
+ *   - The current amount of memory used by the JVM (MB)
+ *   - The amount of CPU resources used by the JVM (%), JRockit only
+ * 
  * @author Yann Lambret
  * @author Kiril Dunn
  */
 public class JVMTest extends TestUtils implements Test {
 
+    /**
+     * WebLogic JVM stats.
+     * 
+     * @param proxy   an applicative proxy for the target WLS instance
+     * @param params  params warning and critical thresholds
+     * @return result collected data and test status
+     */
     public Result run(WLSProxy proxy, String params) {
-        // Test result
         Result result = new Result();
-
-        // Test overall status code
         int code = 0;
 
         // Test thresholds

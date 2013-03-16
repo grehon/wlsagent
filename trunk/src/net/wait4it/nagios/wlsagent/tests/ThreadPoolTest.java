@@ -29,6 +29,16 @@ import net.wait4it.nagios.wlsagent.core.Status;
 import net.wait4it.nagios.wlsagent.core.WLSProxy;
 
 /**
+ * Gets statistics for the WebLogic thread pool.
+ * 
+ * The following metrics are available:
+ * 
+ *   - The thread pool current size
+ *   - The active thread count
+ *   - The hogging thread count
+ *   - The stuck thread count
+ *   - The thread pool throughput
+ * 
  * @author Yann Lambret
  * @author Kiril Dunn
  */
@@ -36,11 +46,15 @@ public class ThreadPoolTest extends TestUtils implements Test {
 
     private static final DecimalFormat DF = new DecimalFormat("0.00");
 
+    /**
+     * WebLogic thread pool stats.
+     * 
+     * @param proxy   an applicative proxy for the target WLS instance
+     * @param params  warning and critical thresholds
+     * @return result collected data and test status
+     */
     public Result run(WLSProxy proxy, String params) {
-        // Test result
         Result result = new Result();
-
-        // Test overall status code
         int code = 0;
 
         // Test thresholds
@@ -69,10 +83,10 @@ public class ThreadPoolTest extends TestUtils implements Test {
                 if ((Boolean)thread.isIdle()) {
                     threadIdleCount += 1;
                 }
-                if ((Boolean)thread.isHogger()) {
+                else if ((Boolean)thread.isHogger()) {
                     threadHoggingCount += 1;
                 }
-                if ((Boolean)thread.isStuck()) { 
+                else if ((Boolean)thread.isStuck()) { 
                     threadStuckCount += 1;
                 }
             }

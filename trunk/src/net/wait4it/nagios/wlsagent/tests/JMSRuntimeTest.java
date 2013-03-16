@@ -30,11 +30,15 @@ import net.wait4it.nagios.wlsagent.core.WLSProxy;
  */
 public class JMSRuntimeTest extends TestUtils implements Test {
 
+    /**
+     * WebLogic JMS connections stats.
+     * 
+     * @param proxy   an applicative proxy for the target WLS instance
+     * @param params  warning and critical thresholds
+     * @return result collected data and test status
+     */
     public Result run(WLSProxy proxy, String params) {
-        // Test result
         Result result = new Result();
-
-        // Test overall status code
         int code = 0;
 
         // Test thresholds
