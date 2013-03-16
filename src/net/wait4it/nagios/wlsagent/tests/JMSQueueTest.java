@@ -31,30 +31,33 @@ import net.wait4it.nagios.wlsagent.core.Status;
 import net.wait4it.nagios.wlsagent.core.WLSProxy;
 
 /**
+ * Gets JMS queues depth.
+ * 
  * @author Yann Lambret
  * @author Kiril Dunn
+ * 
  */
 public class JMSQueueTest extends TestUtils implements Test {
 
+    /**
+     * WebLogic JMS queues stats.
+     * 
+     * @param proxy   an applicative proxy for the target WLS instance
+     * @param params  a pipe separated list of queue names, or
+     *                a wildcard character (*) for all queues
+     * @return result collected data and test status
+     */
     public Result run(WLSProxy proxy, String params) {
-        // Test result
         Result result = new Result();
-
-        // Test performance data
         List<String> output = new ArrayList<String>();
-
-        // Test specific messages
         List<String> message = new ArrayList<String>();
-
-        // Test overall status code
         int code = 0;
 
         // Test thresholds
         long warning;
         long critical;
-
-        Map<String,String> destinations = new HashMap<String,String>();
         String thresholds = "";
+        Map<String,String> destinations = new HashMap<String,String>();
 
         // Test code for a specific queue
         int testCode = 0;

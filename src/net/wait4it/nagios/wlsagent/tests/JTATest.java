@@ -25,11 +25,20 @@ import net.wait4it.nagios.wlsagent.core.Status;
 import net.wait4it.nagios.wlsagent.core.WLSProxy;
 
 /**
+ * Gets the current transaction active count.
+ * 
  * @author Yann Lambret
  * @author Kiril Dunn
  */
 public class JTATest extends TestUtils implements Test {
 
+    /**
+     * WebLogic JTA stats.
+     * 
+     * @param  proxy  an applicative proxy for the target WLS instance
+     * @param  params warning and critical thresholds
+     * @return result collected data and test status
+     */
     public Result run(WLSProxy proxy, String params) {
         Result result = new Result();
         int code = 0;

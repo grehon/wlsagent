@@ -31,30 +31,40 @@ import net.wait4it.nagios.wlsagent.core.Status;
 import net.wait4it.nagios.wlsagent.core.WLSProxy;
 
 /**
+ * Gets statistics for JDBC datasources.
+ * 
+ * The following metrics are available:
+ * 
+ *   - The datasource current pool size
+ *   - The active connection count
+ *   - The number of threads waiting for
+ *     a connection from the pool
+ * 
  * @author Yann Lambret
  * @author Kiril Dunn
+ *
  */
 public class JDBCTest extends TestUtils implements Test {
 
+    /**
+     * WebLogic JDBC datasources stats.
+     * 
+     * @param proxy   an applicative proxy for the target WLS instance
+     * @param params  a pipe separated list of datasource names, or
+     *                a wildcard character (*) for all datasources
+     * @return result collected data and test status
+     */
     public Result run(WLSProxy proxy, String params) {
-        // Test result
         Result result = new Result();
-
-        // Test performance data
         List<String> output = new ArrayList<String>();
-
-        // Test specific messages
         List<String> message = new ArrayList<String>();
-
-        // Test overall status code
         int code = 0;
 
         // Test thresholds
         long warning;
         long critical;
-
-        Map<String,String> datasources = new HashMap<String,String>();
         String thresholds = "";
+        Map<String,String> datasources = new HashMap<String,String>();
 
         // Test code for a specific datasource
         int testCode = 0;

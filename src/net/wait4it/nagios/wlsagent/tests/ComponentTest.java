@@ -33,8 +33,12 @@ import net.wait4it.nagios.wlsagent.core.Status;
 import net.wait4it.nagios.wlsagent.core.WLSProxy;
 
 /**
+ * Gets the current HTTP sessions count
+ * for a web application.
+ *
  * @author Yann Lambret
  * @author Kiril Dunn
+ * 
  */
 public class ComponentTest extends TestUtils implements Test {
 
@@ -50,25 +54,25 @@ public class ComponentTest extends TestUtils implements Test {
             "uddi",
             "uddiexplorer"));
 
+    /**
+     * WebLogic applications stats.
+     * 
+     * @param proxy   an applicative proxy for the target WLS instance
+     * @param params  a pipe separated list of web application names, or
+     *                a wildcard character (*) for all web applications
+     * @return result collected data and test status
+     */
     public Result run(WLSProxy proxy, String params) {
-        // Test result
         Result result = new Result();
-
-        // Test performance data
         List<String> output = new ArrayList<String>();
-
-        // Test specific messages
         List<String> message = new ArrayList<String>();
-
-        // Test overall status code
         int code = 0;
 
         // Test thresholds
         long warning;
         long critical;
-
-        Map<String,String> components = new HashMap<String,String>();
         String thresholds = "";
+        Map<String,String> components = new HashMap<String,String>();
 
         // Test code for a specific application
         int testCode = 0;
@@ -77,7 +81,6 @@ public class ComponentTest extends TestUtils implements Test {
         String prefix = "HTTP session count: ";
 
         // Performance data
-        String contextRoot;
         long openSessions;
 
         // Parses HTTP query params
@@ -90,6 +93,7 @@ public class ComponentTest extends TestUtils implements Test {
             for (ObjectName applicationRuntime : applicationRuntimeMbeans) {
                 ObjectName[] componentRuntimeMbeans = proxy.getMBeans(applicationRuntime, "ComponentRuntimes");
                 for (ObjectName componentRuntime : componentRuntimeMbeans) {
+                    String contextRoot;
                     try {
                         contextRoot = (String)proxy.getAttribute(componentRuntime, "ContextRoot");
                         // The context root may be an empty string or a single character
