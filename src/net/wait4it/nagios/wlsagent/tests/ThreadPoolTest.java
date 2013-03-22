@@ -83,10 +83,10 @@ public class ThreadPoolTest extends TestUtils implements Test {
                 if ((Boolean)thread.isIdle()) {
                     threadIdleCount += 1;
                 }
-                else if ((Boolean)thread.isHogger()) {
+                if ((Boolean)thread.isHogger()) {
                     threadHoggingCount += 1;
                 }
-                else if ((Boolean)thread.isStuck()) { 
+                if ((Boolean)thread.isStuck()) { 
                     threadStuckCount += 1;
                 }
             }
