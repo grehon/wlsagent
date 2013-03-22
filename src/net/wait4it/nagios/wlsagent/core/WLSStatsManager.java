@@ -52,7 +52,7 @@ public class WLSStatsManager {
             serverState = proxy.getServerState();
         } catch (Exception e) {
             e.printStackTrace();
-            return "3|" + e;
+            return "2|" + e;
         }
 
         header.append(serverName + " is in " + serverState + " state, ");
