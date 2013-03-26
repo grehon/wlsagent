@@ -73,9 +73,9 @@ public class JDBCTest extends TestUtils implements Test {
         String prefix = "datasource active count: ";
 
         // Performance data
-        long currCapacity;
-        long activeConnectionsCurrentCount;
-        long waitingForConnectionCurrentCount;
+        int currCapacity;
+        int activeConnectionsCurrentCount;
+        int waitingForConnectionCurrentCount;
 
         // Parses HTTP query params
         for (String s : Arrays.asList(params.split("\\|"))) {
@@ -88,9 +88,9 @@ public class JDBCTest extends TestUtils implements Test {
             for (ObjectName datasourceRuntime : jdbcDataSourceRuntimeMbeans) {
                 String datasourceName = (String)proxy.getAttribute(datasourceRuntime, "Name");
                 if (datasources.containsKey("*") || datasources.containsKey(datasourceName)) {
-                    currCapacity = (Long)proxy.getAttribute(datasourceRuntime, "CurrCapacity");
-                    activeConnectionsCurrentCount = (Long)proxy.getAttribute(datasourceRuntime, "ActiveConnectionsCurrentCount");
-                    waitingForConnectionCurrentCount = (Long)proxy.getAttribute(datasourceRuntime, "WaitingForConnectionCurrentCount");
+                    currCapacity = (Integer)proxy.getAttribute(datasourceRuntime, "CurrCapacity");
+                    activeConnectionsCurrentCount = (Integer)proxy.getAttribute(datasourceRuntime, "ActiveConnectionsCurrentCount");
+                    waitingForConnectionCurrentCount = (Integer)proxy.getAttribute(datasourceRuntime, "WaitingForConnectionCurrentCount");
                     StringBuilder out = new StringBuilder();
                     out.append("jdbc-").append(datasourceName).append("-capacity=").append(currCapacity).append(" ");
                     out.append("jdbc-").append(datasourceName).append("-active=").append(activeConnectionsCurrentCount).append(" ");

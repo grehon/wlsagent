@@ -81,7 +81,7 @@ public class ComponentTest extends TestUtils implements Test {
         String prefix = "HTTP session count: ";
 
         // Performance data
-        long openSessions;
+        int openSessions;
 
         // Parses HTTP query params
         for (String s : Arrays.asList(params.split("\\|"))) {
@@ -108,7 +108,7 @@ public class ComponentTest extends TestUtils implements Test {
                         continue;
                     }
                     if (components.containsKey("*") || components.containsKey(contextRoot)) {
-                        openSessions = (Long)proxy.getAttribute(componentRuntime, "OpenSessionsCurrentCount");
+                        openSessions = (Integer)proxy.getAttribute(componentRuntime, "OpenSessionsCurrentCount");
                         output.add("app-" + contextRoot + "=" + openSessions);
                         thresholds = components.get("*") != null ? components.get("*") : components.get(contextRoot);
                         warning = Long.parseLong(thresholds.split(",")[0]);
