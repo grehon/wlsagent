@@ -56,10 +56,10 @@ public class JMSRuntimeTest extends TestUtils implements Test {
         try {
             ObjectName jmsRuntimeMbean = proxy.getMBean("JMSRuntime");
             connectionsCurrentCount = (Long)proxy.getAttribute(jmsRuntimeMbean, "ConnectionsCurrentCount");
-            result.setOutput("JmsService-current=" + connectionsCurrentCount);
+            result.setOutput("JmsRuntime-current=" + connectionsCurrentCount);
             code = checkResult(connectionsCurrentCount, critical, warning);
             if (code == Status.WARNING.getCode() || code == Status.CRITICAL.getCode()) {
-                result.setMessage("JMS service connection count (" + connectionsCurrentCount + ")");
+                result.setMessage("JMS runtime connection count (" + connectionsCurrentCount + ")");
             }
         } catch (Exception e) {
             e.printStackTrace();
