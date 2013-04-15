@@ -131,6 +131,13 @@ public class WLSProxy {
         return (ObjectName[])connection.getAttribute(mbean, query);
     }
 
+    /**
+     * Gets an array of child MBeans from serverRuntimeMBean.
+     * 
+     * @param  query
+     * @return 
+     * @throws Exception
+     */
     public ObjectName[] getMBeans(String query) throws Exception {
         return (ObjectName[])connection.getAttribute(serverRuntimeMBean, query);
     }
@@ -147,6 +154,13 @@ public class WLSProxy {
         return (ObjectName)connection.getAttribute(mbean, query);
     }
 
+    /**
+     * Gets a single MBean from serverRuntimeMBean.
+     * 
+     * @param  query
+     * @return
+     * @throws Exception
+     */
     public ObjectName getMBean(String query) throws Exception {
         return (ObjectName)connection.getAttribute(serverRuntimeMBean, query);
     }
