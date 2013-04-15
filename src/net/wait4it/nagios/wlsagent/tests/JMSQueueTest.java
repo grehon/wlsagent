@@ -62,6 +62,9 @@ public class JMSQueueTest extends TestUtils implements Test {
         // Test code for a specific queue
         int testCode = 0;
 
+        // Destinations status
+        int paused = 0;
+
         // Message prefix
         String prefix = "JMS message count: ";
 
@@ -69,6 +72,7 @@ public class JMSQueueTest extends TestUtils implements Test {
         String destinationName;
         long messagesCurrentCount;
         long messagesPendingCount;
+        long consumersCurrentCount;
 
         // Parses HTTP query params
         for (String s : Arrays.asList(params.split("\\|"))) {
@@ -91,9 +95,14 @@ public class JMSQueueTest extends TestUtils implements Test {
                     if (destinations.containsKey("*") || destinations.containsKey(destinationName)) {
                         messagesCurrentCount = (Long)proxy.getAttribute(jmsDestinationRuntime, "MessagesCurrentCount");
                         messagesPendingCount = (Long)proxy.getAttribute(jmsDestinationRuntime, "MessagesPendingCount");
+                        consumersCurrentCount = (Long)proxy.getAttribute(jmsDestinationRuntime, "ConsumersCurrentCount");
+                        if ((Boolean)proxy.getAttribute(jmsDestinationRuntime, "ProductionPaused")) {
+                            paused += 1;
+                        }
                         StringBuilder out = new StringBuilder();
                         out.append("JmsQueue-").append(destinationName).append("-current=").append(messagesCurrentCount).append(" ");
-                        out.append("JmsQueue-").append(destinationName).append("-pending=").append(messagesPendingCount);
+                        out.append("JmsQueue-").append(destinationName).append("-pending=").append(messagesPendingCount).append(" ");
+                        out.append("JmsQueue-").append(destinationName).append("-consumers=").append(consumersCurrentCount);
                         output.add(out.toString());
                         thresholds = destinations.get("*") != null ? destinations.get("*") : destinations.get(destinationName);
                         warning = Long.parseLong(thresholds.split(",")[0]);
@@ -111,6 +120,18 @@ public class JMSQueueTest extends TestUtils implements Test {
             result.setStatus(Status.UNKNOWN);
             result.setMessage(e.toString());
             return result;
+        }
+
+        // JMS destinations status and specific message
+        if (code == Status.OK.getCode() && paused > 0) {
+            code = Status.WARNING.getCode();
+        }
+
+        if (paused > 0 && message.size() > 0) {
+            prefix = "paused destinations: " + paused + " - " + prefix;
+        } else if (paused > 0) {
+            prefix = "paused destinations: ";
+            message.add(String.valueOf(paused));
         }
 
         for (Status status : Status.values()) {
