@@ -67,7 +67,7 @@ public class WLSStatsManager {
                 checkResult(option.getTest().run(proxy, params.get(option.getName())));
             }
         }
-        
+
         // Closes the JMX connector
         proxy.clean();
 

@@ -41,7 +41,7 @@ public class WLSAgent {
         // Jetty server connector is created from plugin arguments
         String host = args[0];
         int port = Integer.parseInt(args[1]);
-        
+
         // Jetty server setup
         InetSocketAddress address = new InetSocketAddress(host, port);
         Server server = new Server(address);

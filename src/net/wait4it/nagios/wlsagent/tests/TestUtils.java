@@ -50,7 +50,7 @@ public abstract class TestUtils {
 
         return code;
     }
-    
+
     public String formatOut(List<String> list) {
         StringBuilder sb = new StringBuilder();
         if (! list.isEmpty()) {

@@ -18,14 +18,7 @@
 
 package net.wait4it.nagios.wlsagent.core;
 
-import net.wait4it.nagios.wlsagent.tests.ComponentTest;
-import net.wait4it.nagios.wlsagent.tests.JDBCTest;
-import net.wait4it.nagios.wlsagent.tests.JMSQueueTest;
-import net.wait4it.nagios.wlsagent.tests.JMSRuntimeTest;
-import net.wait4it.nagios.wlsagent.tests.JTATest;
-import net.wait4it.nagios.wlsagent.tests.JVMTest;
-import net.wait4it.nagios.wlsagent.tests.Test;
-import net.wait4it.nagios.wlsagent.tests.ThreadPoolTest;
+import net.wait4it.nagios.wlsagent.tests.*;
 
 /**
  * @author Yann Lambret
