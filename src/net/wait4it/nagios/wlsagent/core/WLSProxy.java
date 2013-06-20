@@ -122,7 +122,7 @@ public class WLSProxy {
      * 
      * @param  mbean
      * @param  query
-     * @return 
+     * @return the target MBeans
      * @throws Exception
      */
     public ObjectName[] getMBeans(ObjectName mbean, String query) throws Exception {
@@ -133,7 +133,7 @@ public class WLSProxy {
      * Gets an array of child MBeans from serverRuntimeMBean.
      * 
      * @param  query
-     * @return 
+     * @return the target MBeans
      * @throws Exception
      */
     public ObjectName[] getMBeans(String query) throws Exception {
@@ -145,7 +145,7 @@ public class WLSProxy {
      * 
      * @param  query
      * @param  mbean
-     * @return
+     * @return the target MBean
      * @throws Exception
      */
     public ObjectName getMBean(ObjectName mbean, String query) throws Exception {
@@ -156,7 +156,7 @@ public class WLSProxy {
      * Gets a single MBean from serverRuntimeMBean.
      * 
      * @param  query
-     * @return
+     * @return the target MBean
      * @throws Exception
      */
     public ObjectName getMBean(String query) throws Exception {
@@ -168,7 +168,7 @@ public class WLSProxy {
      * 
      * @param  mbean
      * @param  attribute
-     * @return
+     * @return the target MBean attribute
      * @throws Exception
      */
     public Object getAttribute(ObjectName mbean, String attribute) throws Exception {
