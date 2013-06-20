@@ -71,12 +71,12 @@ public class WLSStatsManager {
         // Closes the JMX connector
         proxy.clean();
 
-        header.append("status ").append(status);
+        header.append("status " + status);
 
         // Something went wrong. We should get useful information
         // from the message string
         if (! status.equals("OK") && message.length() > 0) {
-            header.append(" - ").append(message.toString());
+            header.append(" - " + message.toString());
         }
 
         output.insert(0, header + "|");
