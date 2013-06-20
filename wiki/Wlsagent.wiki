@@ -21,15 +21,23 @@ wlsagent-r160.jar
 wlsagent.sh
 }}}
 
-The lib directory contains the required Jetty dependencies. From now on, I will be using an 'org.eclipse.jetty.aggregate' artifact so there is only one jar for the jetty container, plus the servlet api jar.
+The lib directory contains the required Jetty dependencies. I'm using an 'org.eclipse.jetty.aggregate' artifact so there is only one jar for the jetty container, plus the servlet api jar.
 
-You have to add some files to the plugin classpath, by creating symbolic links to the existing weblogic.jar, wlclient.jar and wljmxclient.jar files of your !WebLogic distribution (located in ${WL_HOME}/server/lib directory). The directory contents should then look like this:
+You have to add some extra dependencies to the plugin classpath, by creating symbolic links to your !WebLogic distribution files, or by copying them into the 'lib' directory. Required dependencies are wlfullclient.jar, wlclient.jar and wljmxclient.jar.
+
+To generate the wlfullclient.jar, go to the ${WL_HOME}/server/lib directory and issue this command:
+
+{{{
+java -jar wljarbuilder.jar
+}}}
+
+The 'lib' directory contents should then look like this:
 
 {{{
 jetty-servlet-7.6.2.v20120308.jar
 servlet-api-2.5.jar
-@weblogic.jar
 @wlclient.jar
+@wlfullclient.jar
 @wljmxclient.jar
 }}}
 
@@ -78,11 +86,12 @@ svn checkout http://wlsagent.googlecode.com/svn/trunk/src
 <project name="wlsagent" basedir="." default="build">
 
     <property name="src.dir"     value="src"/>
+    <property name="lib.dir"     value="lib"/>
     <property name="build.dir"   value="build"/>
     <property name="classes.dir" value="${build.dir}/classes"/>
     <property name="jar.dir"     value="${build.dir}/jar"/>
-    <property name="lib.dir"     value="lib"/>
-    <property name="main-class"  value="net.wait4it.wlsagent.WlsAgent"/>
+    <property name="javadoc.dir" value="${build.dir}/javadoc" />
+    <property name="main-class"  value="net.wait4it.nagios.wlsagent.core.WLSAgent"/>
 
     <path id="classpath">
         <fileset dir="${lib.dir}" includes="**/*.jar"/>
@@ -94,7 +103,7 @@ svn checkout http://wlsagent.googlecode.com/svn/trunk/src
 
     <target name="compile">
         <mkdir dir="${classes.dir}"/>
-        <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath" includeantruntime="true"/>
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath" includeantruntime="false"/>
     </target>
 
     <target name="jar" depends="compile">
@@ -104,6 +113,14 @@ svn checkout http://wlsagent.googlecode.com/svn/trunk/src
                 <attribute name="Main-Class" value="${main-class}"/>
             </manifest>
         </jar>
+    </target>
+
+    <target name="javadoc">
+        <javadoc packagenames="src" sourcepath="${src.dir}" destdir="${javadoc.dir}" classpathref="classpath">
+            <fileset dir="${src.dir}">
+                <include name="**" />
+            </fileset>
+        </javadoc>
     </target>
 
     <target name="build" depends="clean,jar"/>
@@ -122,7 +139,7 @@ You can use the sample script below to run the plugin:
 
 cd $(dirname "$0")
 
-JAVA_HOME="/home/wls/Oracle/Middleware/jdk160_29"
+JAVA_HOME=""
 HOST="0.0.0.0"
 PORT="9090"
 
@@ -132,10 +149,10 @@ CLASSPATH=".:wlsagent-r160.jar"
 CLASSPATH="${CLASSPATH}:lib/servlet-api-2.5.jar:lib/jetty-servlet-7.6.2.v20120308.jar" 
 
 # Add WebLogic dependencies to the plugin classpath.
-# The 'wljmxclient.jar' must be loaded before the 'weblogic.jar'.
-CLASSPATH="${CLASSPATH}:lib/wlclient.jar:lib/wljmxclient.jar:lib/weblogic.jar"
+# The 'wljmxclient.jar' must be loaded before the 'wlfullclient.jar'.
+CLASSPATH="${CLASSPATH}:lib/wlclient.jar:lib/wljmxclient.jar:lib/wlfullclient.jar"
 
-${JAVA_HOME}/bin/java -Xmx32m -cp ${CLASSPATH} net.wait4it.wlsagent.WlsAgent ${HOST} ${PORT} > /dev/null 2>&1 &
+${JAVA_HOME}/bin/java -Xmx32m -cp ${CLASSPATH} net.wait4it.nagios.wlsagent.core.WLSAgent ${HOST} ${PORT} > /dev/null 2>&1 &
 }}}
 
 The content of the working directory should look like this:
@@ -148,8 +165,8 @@ The lib directory contains the jar dependencies for Jetty and the !WebLogic impl
 {{{
 jetty-servlet-7.6.2.v20120308.jar
 servlet-api-2.5.jar
-@weblogic.jar
 @wlclient.jar
+@wlfullclient.jar
 @wljmxclient.jar
 }}}
 
