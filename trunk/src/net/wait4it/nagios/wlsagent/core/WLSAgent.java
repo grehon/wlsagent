@@ -18,7 +18,6 @@
 
 package net.wait4it.nagios.wlsagent.core;
 
-
 import java.net.InetSocketAddress;
 
 
@@ -33,9 +32,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
  */
 public class WLSAgent {
 
-    private WLSAgent() {
-
-    }
+    private WLSAgent() {}
 
     public static void main(String[] args) throws Exception {
         // Jetty server connector is created from plugin arguments

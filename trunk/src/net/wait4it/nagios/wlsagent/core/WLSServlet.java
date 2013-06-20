@@ -30,14 +30,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 /**
  * Builds a HashMap with the HTTP query parameters,
  * calls WLSStatsManager process method and display
  * the result as plain old text
  * 
  * @author Yann Lambret
- *
+ * 
  */
 @SuppressWarnings("serial")
 public class WLSServlet extends HttpServlet {

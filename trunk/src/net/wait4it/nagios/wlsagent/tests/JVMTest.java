@@ -38,6 +38,7 @@ import net.wait4it.nagios.wlsagent.core.WLSProxy;
  * 
  * @author Yann Lambret
  * @author Kiril Dunn
+ * 
  */
 public class JVMTest extends TestUtils implements Test {
 
@@ -75,11 +76,11 @@ public class JVMTest extends TestUtils implements Test {
             heapFreeCurrent = format((Long)proxy.getAttribute(jvmRuntimeMbean, "HeapFreeCurrent"));
             heapUsedCurrent = heapSizeCurrent - heapFreeCurrent;
             StringBuilder out = new StringBuilder();
-            out.append("HeapSize=").append(heapSizeCurrent).append("MB;;;0;").append(heapSizeMax).append(" ");
-            out.append("UsedMemory=").append(heapUsedCurrent).append("MB;;;0;").append(heapSizeMax);
+            out.append("HeapSize=" + heapSizeCurrent + "MB;;;0;" + heapSizeMax + " ");
+            out.append("UsedMemory=" + heapUsedCurrent + "MB;;;0;" + heapSizeMax);
             try {
                 jvmProcessorLoad = (Double)proxy.getAttribute(jvmRuntimeMbean, "JvmProcessorLoad");
-                out.append(" JvmProcessorLoad=").append(Math.round(jvmProcessorLoad * 100)).append("%;;;0;100");
+                out.append(" JvmProcessorLoad=" + Math.round(jvmProcessorLoad * 100) + "%;;;0;100");
             } catch (AttributeNotFoundException ignored) {
                 // Not dealing with a JRockitRuntimeMBean
             }

@@ -41,6 +41,7 @@ import net.wait4it.nagios.wlsagent.core.WLSProxy;
  * 
  * @author Yann Lambret
  * @author Kiril Dunn
+ * 
  */
 public class ThreadPoolTest extends TestUtils implements Test {
 
@@ -63,11 +64,11 @@ public class ThreadPoolTest extends TestUtils implements Test {
 
         // Performance data
         ExecuteThread threadsArray[];
-        int threadIdleCount = 0;
-        int threadHoggingCount = 0;
-        int threadStuckCount = 0;
-        int threadTotalCount;
-        int threadActiveCount;
+        int idleCount = 0;
+        int hoggingCount = 0;
+        int stuckCount = 0;
+        int totalCount;
+        int activeCount;
         double throughput;
 
         // Parses HTTP query params
@@ -80,28 +81,22 @@ public class ThreadPoolTest extends TestUtils implements Test {
             throughput = (Double)proxy.getAttribute(threadPoolRuntimeMbean, "Throughput");
             threadsArray = (ExecuteThread[])proxy.getAttribute(threadPoolRuntimeMbean, "ExecuteThreads");
             for (ExecuteThread thread : threadsArray) { 
-                if ((Boolean)thread.isIdle()) {
-                    threadIdleCount += 1;
-                }
-                if ((Boolean)thread.isHogger()) {
-                    threadHoggingCount += 1;
-                }
-                if ((Boolean)thread.isStuck()) { 
-                    threadStuckCount += 1;
-                }
+                if ((Boolean)thread.isIdle()) { idleCount += 1; }
+                if ((Boolean)thread.isHogger()) { hoggingCount += 1; }
+                if ((Boolean)thread.isStuck()) { stuckCount += 1; }
             }
-            threadTotalCount = threadsArray.length;
-            threadActiveCount = threadTotalCount - threadIdleCount;
+            totalCount = threadsArray.length;
+            activeCount = totalCount - idleCount;
             StringBuilder out = new StringBuilder();
-            out.append("ThreadPoolSize=").append(threadTotalCount).append(" ");
-            out.append("ThreadActiveCount=").append(threadActiveCount).append(";;;0;").append(threadTotalCount).append(" ");
-            out.append("ThreadHoggingCount=").append(threadHoggingCount).append(";;;0;").append(threadTotalCount).append(" ");
-            out.append("ThreadStuckCount=").append(threadStuckCount).append(";;;0;").append(threadTotalCount).append(" ");
-            out.append("Throughput=").append(DF.format(throughput));
+            out.append("ThreadPoolSize=" + totalCount + " ");
+            out.append("ThreadActiveCount=" + activeCount + ";;;0;" + totalCount + " ");
+            out.append("ThreadHoggingCount=" + hoggingCount + ";;;0;" + totalCount + " ");
+            out.append("ThreadStuckCount=" + stuckCount + ";;;0;" + totalCount + " ");
+            out.append("Throughput=" + DF.format(throughput));
             result.setOutput(out.toString());
-            code = checkResult(threadStuckCount, critical, warning);
+            code = checkResult(stuckCount, critical, warning);
             if (code == Status.WARNING.getCode() || code == Status.CRITICAL.getCode()) {
-                result.setMessage("thread pool stuck count (" + threadStuckCount + "/" + threadTotalCount + ")");
+                result.setMessage("thread pool stuck count (" + stuckCount + "/" + totalCount + ")");
             }
         } catch (Exception e) {
             e.printStackTrace();

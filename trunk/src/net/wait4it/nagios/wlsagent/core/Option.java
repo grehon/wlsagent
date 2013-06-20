@@ -22,6 +22,7 @@ import net.wait4it.nagios.wlsagent.tests.*;
 
 /**
  * @author Yann Lambret
+ * 
  */
 public enum Option {
 

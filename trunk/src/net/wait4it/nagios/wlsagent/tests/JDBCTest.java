@@ -73,9 +73,9 @@ public class JDBCTest extends TestUtils implements Test {
         String prefix = "datasource active count: ";
 
         // Performance data
-        int currCapacity;
-        int activeConnectionsCurrentCount;
-        int waitingForConnectionCurrentCount;
+        int capacity;
+        int activeCount;
+        int waitingCount;
 
         // Parses HTTP query params
         for (String s : Arrays.asList(params.split("\\|"))) {
@@ -88,20 +88,20 @@ public class JDBCTest extends TestUtils implements Test {
             for (ObjectName datasourceRuntime : jdbcDataSourceRuntimeMbeans) {
                 String datasourceName = (String)proxy.getAttribute(datasourceRuntime, "Name");
                 if (datasources.containsKey("*") || datasources.containsKey(datasourceName)) {
-                    currCapacity = (Integer)proxy.getAttribute(datasourceRuntime, "CurrCapacity");
-                    activeConnectionsCurrentCount = (Integer)proxy.getAttribute(datasourceRuntime, "ActiveConnectionsCurrentCount");
-                    waitingForConnectionCurrentCount = (Integer)proxy.getAttribute(datasourceRuntime, "WaitingForConnectionCurrentCount");
+                    capacity = (Integer)proxy.getAttribute(datasourceRuntime, "CurrCapacity");
+                    activeCount = (Integer)proxy.getAttribute(datasourceRuntime, "ActiveConnectionsCurrentCount");
+                    waitingCount = (Integer)proxy.getAttribute(datasourceRuntime, "WaitingForConnectionCurrentCount");
                     StringBuilder out = new StringBuilder();
-                    out.append("jdbc-").append(datasourceName).append("-capacity=").append(currCapacity).append(" ");
-                    out.append("jdbc-").append(datasourceName).append("-active=").append(activeConnectionsCurrentCount).append(" ");
-                    out.append("jdbc-").append(datasourceName).append("-waiting=").append(waitingForConnectionCurrentCount);
+                    out.append("jdbc-" + datasourceName + "-capacity=" + capacity + " ");
+                    out.append("jdbc-" + datasourceName + "-active=" + activeCount + " ");
+                    out.append("jdbc-" + datasourceName + "-waiting=" + waitingCount);
                     output.add(out.toString());
                     thresholds = datasources.get("*") != null ? datasources.get("*") : datasources.get(datasourceName);
                     warning = Long.parseLong(thresholds.split(",")[0]);
                     critical = Long.parseLong(thresholds.split(",")[1]);
-                    testCode = checkResult(waitingForConnectionCurrentCount, critical, warning);
+                    testCode = checkResult(waitingCount, critical, warning);
                     if (testCode == Status.WARNING.getCode() || testCode == Status.CRITICAL.getCode()) {
-                        message.add(datasourceName + " (" + waitingForConnectionCurrentCount + ")");
+                        message.add(datasourceName + " (" + waitingCount + ")");
                         code = (testCode > code) ? testCode : code;
                     }
                 }

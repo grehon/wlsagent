@@ -27,6 +27,7 @@ import net.wait4it.nagios.wlsagent.core.WLSProxy;
 /**
  * @author Yann Lambret
  * @author Kiril Dunn
+ * 
  */
 public class JMSRuntimeTest extends TestUtils implements Test {
 

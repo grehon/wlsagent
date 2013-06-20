@@ -100,9 +100,9 @@ public class JMSQueueTest extends TestUtils implements Test {
                             paused += 1;
                         }
                         StringBuilder out = new StringBuilder();
-                        out.append("JmsQueue-").append(destinationName).append("-current=").append(messagesCurrentCount).append(" ");
-                        out.append("JmsQueue-").append(destinationName).append("-pending=").append(messagesPendingCount).append(" ");
-                        out.append("JmsQueue-").append(destinationName).append("-consumers=").append(consumersCurrentCount);
+                        out.append("JmsQueue-" + destinationName + "-current=" + messagesCurrentCount + " ");
+                        out.append("JmsQueue-" + destinationName + "-pending=" + messagesPendingCount + " ");
+                        out.append("JmsQueue-" + destinationName + "-consumers=" + consumersCurrentCount);
                         output.add(out.toString());
                         thresholds = destinations.get("*") != null ? destinations.get("*") : destinations.get(destinationName);
                         warning = Long.parseLong(thresholds.split(",")[0]);

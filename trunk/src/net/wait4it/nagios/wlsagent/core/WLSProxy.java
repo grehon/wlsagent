@@ -32,11 +32,9 @@ import javax.management.remote.JMXServiceURL;
 
 import javax.naming.Context;
 
-
 /**
- * 
  * @author Yann Lambret
- *
+ * 
  */
 public class WLSProxy {
 

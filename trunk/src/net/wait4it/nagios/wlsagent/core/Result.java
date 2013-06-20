@@ -20,6 +20,7 @@ package net.wait4it.nagios.wlsagent.core;
 
 /**
  * @author Yann Lambret
+ * 
  */
 public class Result {
 

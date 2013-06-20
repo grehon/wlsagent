@@ -21,6 +21,7 @@ package net.wait4it.nagios.wlsagent.core;
 /**
  * @author Yann Lambret
  * @author Kiril Dunn
+ * 
  */
 public enum Status {
 
