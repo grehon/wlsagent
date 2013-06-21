@@ -17,7 +17,7 @@ First things first, go to the 'Downloads' section and retrieve the most recent b
 {{{
 lib
 run.sh
-wlsagent-r160.jar
+wlsagent-r185.jar
 wlsagent.sh
 }}}
 
@@ -143,7 +143,7 @@ JAVA_HOME=""
 HOST="0.0.0.0"
 PORT="9090"
 
-CLASSPATH=".:wlsagent-r160.jar"
+CLASSPATH=".:wlsagent-r185.jar"
 
 # Add Jetty dependencies to the plugin classpath.
 CLASSPATH="${CLASSPATH}:lib/servlet-api-2.5.jar:lib/jetty-servlet-7.6.2.v20120308.jar" 
@@ -157,7 +157,7 @@ ${JAVA_HOME}/bin/java -Xmx32m -cp ${CLASSPATH} net.wait4it.nagios.wlsagent.core.
 
 The content of the working directory should look like this:
   * the lib directory
-  * the wlsagent-r160.jar file
+  * the wlsagent-r185.jar file
   * the previous shell script (run.sh)
 
 The lib directory contains the jar dependencies for Jetty and the !WebLogic implementation of the 't3' protocol:
@@ -183,7 +183,7 @@ The above command produces the following output:
 
 3|java.io.IOException: Unhandled exception in lookup
 
-As you can see, every non authenticated request is denied. Notice the first character of the command output string is the regular Nagios exit code (UNKNOWN in this case).
+As you can see, every non authenticated request is denied. Note that the first character of the command output string is the regular Nagios exit code (UNKNOWN in this case).
 
 In order to monitor your application servers, you can create a specific user on the !WebLogic side, and make sure it belongs to the monitor group. This is particularly important if your !WebLogic domain is secured with SSL, as an administrative user can't use an non-administrative port.
 
@@ -235,7 +235,7 @@ Available options are:
  * [ThreadPool thread-pool]
  * [Jta jta]
  * [Jdbc jdbc]
- * [JmsService jms-service]
+ * [JmsRuntime jms-runtime]
  * [JmsQueue jms-queue]
  * [Component component]
 
