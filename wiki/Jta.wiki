@@ -5,7 +5,7 @@
   * Invocation
 
 {{{
-jta=ActiveTransactions;15;30
+jta=ActiveTransactions,15,30
 }}}
 
 15 is the warning threshold for the transaction active count. 30 is the critical threshold for the transaction active count.
