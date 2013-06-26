@@ -54,7 +54,7 @@ Then type :
 And send a test request to your server (the port specified here is the connector of the target server):
 
 {{{
-./wlsagent.sh 'hostname=hydre2&port=7001&username=nagios&password=Weblogic10&jvm=UsedMemory;90;95'
+./wlsagent.sh 'hostname=hydre2&port=7001&username=nagios&password=Weblogic10&jvm=UsedMemory,90,95'
 }}}
 
 You should get something like:
@@ -201,10 +201,10 @@ The Nagios exit code is 0 (OK), because we didn't perform any test on the one ha
 
 2|server1 is in ADMIN state, status CRITICAL|
 
-Next we're going to get information about the JVM heap usage by adding [Jvm jvm]=!UsedMemory;80;90 to the request parameters :
+Next we're going to get information about the JVM heap usage by adding [Jvm jvm]=!UsedMemory,80,90 to the request parameters :
 
 {{{
-wget -q -O - 'http://localhost:9090/wlsagent/WlsAgent' --post-data='hostname=localhost&port=7500&username=nagios&password=nagios&jvm=UsedMemory;80;90'
+wget -q -O - 'http://localhost:9090/wlsagent/WlsAgent' --post-data='hostname=localhost&port=7500&username=nagios&password=nagios&jvm=UsedMemory,80,90'
 }}}
 
 The two numeric values at the end are the warning and critical thresholds for the memory usage, we will go back on this later.
@@ -218,7 +218,7 @@ As you can see, we get the current heap size, the maximum heap size and the amou
 Let's try to change the warning threshold value to '30':
 
 {{{
-wget -q -O - 'http://localhost:9090/wlsagent/WlsAgent' --post-data='hostname=localhost&port=7500&username=nagios&password=nagios&jvm=UsedMemory;30;90'
+wget -q -O - 'http://localhost:9090/wlsagent/WlsAgent' --post-data='hostname=localhost&port=7500&username=nagios&password=nagios&jvm=UsedMemory,30,90'
 }}}
 
 We get this:
