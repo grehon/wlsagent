@@ -5,7 +5,7 @@
   * Invocation
 
 {{{
-thread-pool=ThreadStuckCount;5;10
+thread-pool=ThreadStuckCount,5,10
 }}}
 
 5 and 10 are respectively the warning and the critical threshold for the thread stuck count value. In this case, a warning alert would be raised if the number of threads marked as stuck is between 5 and 9.
