@@ -5,15 +5,15 @@
   * Invocation
 
 {{{
-jdbc=<datasource 1>;w;c|<datasource 2>;w;c|...|<datasource N>;w;c
+jdbc=<datasource 1>,w,c|<datasource 2>,w,c|...|<datasource N>,w,c
 }}}
 
-In this generic example, 'datasource 1' ... 'datasource N' would be jdbc datasource names, and 'w' and 'c' would be warning and critical thresholds.
+In this generic example, 'datasource 1' ... 'datasource N' would be jdbc datasource names (JNDI names actually), and 'w' and 'c' would be warning and critical thresholds.
 
 So you could have for instance:
 
 {{{
-jdbc=jdbc/ds1;2;5|jdbc/ds2;2;5
+jdbc=jdbc/ds1,2,5|jdbc/ds2,2,5
 }}}
 
 When using this option, you can specify 'warning' and 'critical' threshold values. The comparison is made beetween the thresholds and the 'waiting' value. So for the ds2 datasource, a warning alert will be raised if 10 or 11 active connections are required by the application, and a critical alert will be raised for 12 active connections required or more.
@@ -21,7 +21,7 @@ When using this option, you can specify 'warning' and 'critical' threshold value
 You can also call the jdbc test with a wildcard:
 
 {{{
-jdbc=*;2;5
+jdbc=*,2,5
 }}}
 
 Notice the 'warning' and 'critical' thresholds will be the same for all datasources though.
