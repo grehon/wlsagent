@@ -7,7 +7,7 @@ The jvm option allows you to monitor the !WebLogic server JVM heap usage (works 
   * Invocation
 
 {{{
-jvm=UsedMemory;90;95
+jvm=UsedMemory,90,95
 }}}
 
 90 is the warning threshold for the JVM heap usage. 95 is the critical threshold for the JVM heap usage.
