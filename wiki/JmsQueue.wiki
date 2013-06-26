@@ -7,7 +7,7 @@ The jms-queue option allows you to monitor the !WebLogic server JMS queues usage
   * Invocation
 
 {{{
-jms-queue=DistributedQueue0;150;200|DistributedQueue1;150;200
+jms-queue=DistributedQueue0,150,200|DistributedQueue1,150,200
 }}}
 
 !DistributedQueue0 and !DistributedQueue1 would be your JMS resources !WebLogic names, and '150' and '200' would be 'warning' and 'critical' thresholds for both of them.
