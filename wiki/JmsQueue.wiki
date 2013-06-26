@@ -12,6 +12,14 @@ jms-queue=DistributedQueue0,150,200|DistributedQueue1,150,200
 
 !DistributedQueue0 and !DistributedQueue1 would be your JMS resources !WebLogic names, and '150' and '200' would be 'warning' and 'critical' thresholds for both of them.
 
+You can also call the jms-queue test with a wildcard character:
+
+{{{
+jms-queue=*,150,200
+}}}
+
+Notice the 'warning' and 'critical' thresholds will be the same for all queues though.
+
   * Output
 
 {{{
